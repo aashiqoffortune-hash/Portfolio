@@ -20,7 +20,7 @@
   --ink:      #0a0908;
   --ink-2:    #100e0e;
   --ink-3:    #15120f;
-  --ink-4:    #6a5d4f;
+  --ink-4:    #9c4a3f;   /* chain numeral — deep red, 3.28:1 as large text */
 
   /* text */
   --bone:     #ece6db;
@@ -203,7 +203,7 @@ body::after {
 /* ── Column ───────────────────────────────────────────────────── */
 
 .column { margin-left: var(--rail); }
-.inner { max-width: 1000px; padding: 0 var(--pad); }
+.inner { max-width: 1060px; margin-inline: auto; padding: 0 var(--pad); }
 
 .section { padding-block: 96px; border-top: 1px solid var(--rule); }
 .section:first-of-type { border-top: 0; }
@@ -211,7 +211,7 @@ body::after {
 .s-head { margin-bottom: 48px; }
 .s-head .eyebrow { display: block; margin-bottom: 14px; }
 .s-title {
-  font-size: clamp(2rem, 4.4vw, 3rem);
+  font-size: clamp(1.8rem, 3.6vw, 2.55rem);
   text-transform: uppercase;
 }
 .s-sub {
@@ -226,7 +226,7 @@ body::after {
 .mast-status { margin-bottom: 34px; }
 
 .mast-name {
-  font-size: clamp(3rem, 9.2vw, 6.6rem);
+  font-size: clamp(3rem, 10.4vw, 8.2rem);
   font-weight: 900; font-stretch: 125%;
   text-transform: uppercase; letter-spacing: -0.035em;
   line-height: 0.92;
@@ -279,7 +279,7 @@ body::after {
 .stat + .stat { padding-left: 22px; }
 .stat-v {
   display: block; font-family: var(--display); font-weight: 900;
-  font-stretch: 120%; font-size: 2.5rem; line-height: 1;
+  font-stretch: 120%; font-size: 3.4rem; line-height: 1;
   letter-spacing: -0.04em; color: var(--bone);
   font-variant-numeric: tabular-nums;
 }
@@ -292,17 +292,28 @@ body::after {
 /* ── Engagement chain ─────────────────────────────────────────── */
 
 .chain { position: relative; display: grid; gap: 0; }
+.chain::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg,
+              var(--sig) 0%, var(--rule-2) 22%, var(--rule-2) 78%, transparent 100%);
+}
 
 .link {
   position: relative;
-  display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 36px;
-  padding: 38px 0;
+  display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 34px;
+  padding: 38px 0 38px 30px;
   border-top: 1px solid var(--rule);
 }
 .link:first-child { border-top: 1px solid var(--rule-2); }
 .link:last-child { border-bottom: 1px solid var(--rule); }
 
 .link-mark { position: relative; }
+.link-mark::before {
+  content: ""; position: absolute; left: -30px; top: 11px;
+  width: 13px; height: 1px; background: var(--rule-2);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.link:hover .link-mark::before { width: 22px; background: var(--sig-lift); }
 .link-stage {
   display: block; font-family: var(--mono); font-size: 0.66rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.16em; color: var(--sig-lift);
@@ -310,8 +321,8 @@ body::after {
 }
 .link-n {
   display: block; font-family: var(--display); font-weight: 900;
-  font-stretch: 120%; font-size: 2.6rem; line-height: 1;
-  color: var(--ink-4); letter-spacing: -0.04em;
+  font-stretch: 120%; font-size: 3.2rem; line-height: 1;
+  color: var(--ink-4); letter-spacing: -0.045em;
   font-variant-numeric: tabular-nums;
   transition: color 0.3s ease;
 }
@@ -579,9 +590,11 @@ body::after {
   .mast { padding-block: 64px 72px; }
   .section { padding-block: 68px; }
 
-  .link { grid-template-columns: 1fr; gap: 18px; }
+  .chain::before { display: none; }
+  .link { grid-template-columns: 1fr; gap: 18px; padding-left: 0; }
+  .link-mark::before { display: none; }
   .link-mark { display: flex; align-items: baseline; gap: 14px; }
-  .link-n { font-size: 1.6rem; color: var(--bone-3); }
+  .link-n { font-size: 1.9rem; }
   .link-stage { margin-bottom: 0; }
 
   .duty, .kit, .defect, .reach li { grid-template-columns: 1fr; gap: 10px; }
