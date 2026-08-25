@@ -1,0 +1,11 @@
+{% macro head(eyebrow, title, sub) %}
+<header class="s-head">
+  <span class="eyebrow">{{ eyebrow }}</span>
+  <h2 class="s-title">{{ title }}</h2>
+  {% if sub %}<p class="s-sub">{{ sub }}</p>{% endif %}
+</header>
+{% endmacro %}
+
+{% macro tags(items) %}
+{% if items %}<ul class="tags">{% for t in items %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}
+{% endmacro %}

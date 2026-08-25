@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% from "macros.html" import head, tags %}
+
+{% block content %}
+
+<!-- ══ Masthead ══════════════════════════════════════════════════ -->
+<section class="inner mast" id="top">
+  <p class="eyebrow mast-status">{{ profile.discipline }}</p>
+
+  <h1 class="mast-name">{{ profile.name }}</h1>
+
+  <p class="mast-disc">
+    <span class="lead">{{ profile.tagline }}</span>
+    <span>{{ profile.location }}</span>
+  </p>
+
+  <p class="thesis">
+    {{ profile.thesis }}
+    <span class="turn">{{ profile.thesis_turn }}</span>
+  </p>
+
+  <div class="mast-lede">
+    {% for para in profile.lede %}<p>{{ para }}</p>{% endfor %}
+  </div>
+
+  <div class="mast-acts">
+    <a class="act act-fill" href="#engagement">How I run an engagement</a>
+    <a class="act" href="#verify">Verify credentials</a>
+    <a class="act" href="mailto:{{ profile.email }}">Email</a>
+  </div>
+
+  <ul class="stats">
+    {% for s in r.stats %}
+    <li class="stat">
+      <span class="stat-v">{{ s.value }}</span>
+      <span class="stat-l">{{ s.label }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<!-- ══ Engagement ════════════════════════════════════════════════ -->
+<section class="inner section" id="engagement">
+  {{ head('Capability',
+          'The engagement',
+          'Ordered the way an engagement actually runs — external position through to
+           deliverable. Each phase is what I do at that stage, and the tooling I reach for.') }}
+
+  <div class="chain">
+    {% for c in r.chain %}
+    <article class="link">
+      <div class="link-mark">
+        <span class="link-stage">{{ c.stage }}</span>
+        <span class="link-n">{{ "%02d"|format(loop.index) }}</span>
+      </div>
+      <div>
+        <h3 class="link-phase">{{ c.phase }}</h3>
+        <div class="link-body">
+          <p>{{ c.summary }}</p>
+          {% if c.detail %}<p>{{ c.detail }}</p>{% endif %}
+        </div>
+        {{ tags(c.tags) }}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ══ Tooling ═══════════════════════════════════════════════════ -->
+<section class="inner section" id="tooling">
+  {{ head('Built',
+          'Tooling & research',
+          'When the tool I need does not behave the way the engagement needs it to,
+           I read its source and write my own.') }}
+
+  <div class="tools">
+    {% for p in r.projects %}
+    <article class="tool">
+      <header class="tool-head">
+        <h3 class="tool-name">{{ p.name }}</h3>
+        <span class="tool-kind">{{ p.kind }}</span>
+        <span class="tool-lang">{{ p.lang }}</span>
+      </header>
+
+      <p class="tool-sum">{{ p.summary }}</p>
+
+      {% if p.findings %}
+      <div class="defects">
+        <p class="defects-intro">{{ p.findings_intro }}</p>
+        {% for f in p.findings %}
+        <div class="defect">
+          <code class="defect-flag">{{ f.flag }}</code>
+          <p class="defect-text">{{ f.text }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if p.footer %}<p class="tool-foot">{{ p.footer }}</p>{% endif %}
+      {{ tags(p.tags) }}
+    </article>
+    {% endfor %}
+  </div>
+
+  <p class="tools-note">Source at <a href="{{ profile.github }}" rel="noopener">github.com/{{ profile.github_handle }}</a></p>
+</section>
+
+<!-- ══ Background ════════════════════════════════════════════════ -->
+<section class="inner section" id="background">
+  {{ head('Prior',
+          'The other side of the table',
+          'Before testing this class of system, I ran it in production — under bank audit,
+           regulatory mandate, and a pager.') }}
+
+  {% for job in r.professional_experience %}
+  <article>
+    <header class="post-head">
+      <div>
+        <h3 class="post-role">{{ job.role }}</h3>
+        <p class="post-org">{{ job.company }} · {{ job.location }}</p>
+      </div>
+      <p class="post-when">{{ job.period }}</p>
+    </header>
+
+    <p class="post-lede">{{ job.lede }}</p>
+
+    <div class="duties">
+      {% for d in job.points %}
+      <div class="duty">
+        <p class="duty-head">{{ d.head }}</p>
+        <p class="duty-body">{{ d.body }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </article>
+  {% endfor %}
+</section>
+
+<!-- ══ Arsenal ═══════════════════════════════════════════════════ -->
+<section class="inner section" id="arsenal">
+  {{ head('Inventory', 'Arsenal', 'Tooling, techniques and platforms in working use.') }}
+
+  <div class="arsenal">
+    {% for s in r.skills %}
+    <div class="kit">
+      <p class="kit-name">{{ s.group }}</p>
+      {{ tags(s['items']) }}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ══ Verify ════════════════════════════════════════════════════ -->
+<section class="inner section" id="verify">
+  {{ head('Evidence',
+          'Verify',
+          'Certifications with issuer verification, not a logo wall. Check them against
+           Red Hat directly.') }}
+
+  <div class="creds">
+    {% for c in credentials %}
+    <article class="cred">
+      <div>
+        <p class="cred-abbr">{{ c.abbr }}</p>
+        <p class="cred-name">{{ c.name }}</p>
+        <p class="cred-meta">
+          <span>{{ c.issuer }}</span>
+          <span>Issued <b>{{ c.issued }}</b></span>
+          <span>ID <b>{{ c.cert_id }}</b></span>
+        </p>
+      </div>
+      <div class="cred-acts">
+        <a href="{{ c.verify }}" rel="noopener">Verify ↗</a>
+        {% if c.pdf_available %}<a href="{{ url_for('static', filename=c.pdf) }}">Certificate</a>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <div class="minor">
+    <div>
+      <h3>Recognition</h3>
+      {% for a in r.awards %}
+      <div class="minor-item">
+        <p class="minor-name">{{ a.name }}</p>
+        <p class="minor-meta">{{ a.issuer }} · {{ a.issued }}</p>
+        <p class="minor-note">{{ a.note }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div>
+      <h3>Education</h3>
+      {% for e in r.education %}
+      <div class="minor-item">
+        <p class="minor-name">{{ e.degree }}</p>
+        <p class="minor-meta">{{ e.institution }} · {{ e.period }} · {{ e.detail }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══ Contact ═══════════════════════════════════════════════════ -->
+<section class="inner section" id="contact">
+  {{ head('Contact', 'Get in touch', '') }}
+
+  <p class="contact-lede">
+    Open to penetration testing engagements and full-time offensive security roles.
+    Email is the fastest route.
+  </p>
+
+  <ul class="reach">
+    <li>
+      <span class="k">Email</span>
+      <a class="v" href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+    </li>
+    <li>
+      <span class="k">GitHub</span>
+      <a class="v" href="{{ profile.github }}" rel="noopener">{{ profile.github_handle }}</a>
+    </li>
+    <li>
+      <span class="k">Based in</span>
+      <span class="v">{{ profile.location }}</span>
+    </li>
+  </ul>
+</section>
+
+{% endblock %}

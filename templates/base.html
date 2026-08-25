@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ profile.name }} — {{ profile.tagline }}{% endblock %}</title>
+  <meta name="description" content="{{ profile.meta_description }}">
+  <meta name="author" content="{{ profile.name }}">
+  <meta name="theme-color" content="#100e0c">
+
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="{{ profile.name }} — {{ profile.tagline }}">
+  <meta property="og:description" content="{{ profile.meta_description }}">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:opsz,wght@6..72,300..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  {# Desktop: a fixed rail carrying identity and current position. #}
+  <aside class="rail">
+    <a class="rail-mark" href="#top">
+      <span class="m-name">{{ profile.name }}</span>
+      <span class="m-role">{{ profile.tagline }}</span>
+    </a>
+
+    <nav class="rail-index" aria-label="Sections">
+      {% for item in nav %}
+      <a href="#{{ item.id }}" data-sec="{{ item.id }}">
+        <span class="n">{{ "%02d"|format(loop.index) }}</span>
+        <span>{{ item.label }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+
+    <div class="rail-foot">
+      <span class="rail-status">Open to work</span>
+      <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+      <a href="{{ profile.github }}" rel="noopener">{{ profile.github_handle }}</a>
+    </div>
+  </aside>
+
+  {# Mobile: the rail collapses to a bar. #}
+  <div class="bar">
+    <a class="bar-mark" href="#top">{{ profile.name }}</a>
+    <button class="bar-btn" type="button" aria-expanded="false" aria-label="Toggle sections">
+      <i></i><i></i><i></i>
+    </button>
+    <nav class="bar-menu" aria-label="Sections">
+      {% for item in nav %}<a href="#{{ item.id }}">{{ item.label }}</a>{% endfor %}
+    </nav>
+  </div>
+
+  <div class="column">
+    <main id="main">{% block content %}{% endblock %}</main>
+
+    <footer class="inner foot">
+      <span>{{ profile.legal_name }} · {{ profile.location }}</span>
+      <span>Flask · Jinja2 · <a href="{{ profile.github }}" rel="noopener">{{ profile.github_handle }}</a></span>
+    </footer>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</body>
+</html>

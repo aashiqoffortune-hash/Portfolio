@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Static build output
+build/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
