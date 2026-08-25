@@ -7,7 +7,6 @@ file — no HTML changes required.
 RESUME = {
     "profile": {
         "name": "Aashiq Shaikh",
-        "legal_name": "Aashiq Sadik Basha Shaikh",
         "tagline": "Penetration Tester",
         "discipline": "Active Directory · Linux · Infrastructure",
         "location": "Navi Mumbai, India",
@@ -311,7 +310,7 @@ RESUME = {
             "issued": "14 August 2024",
             "cert_id": "220-172-050",
             "verify": "https://www.credly.com/badges/a78c122a-86d8-4848-bbd7-166daabc1835",
-            "pdf": "files/RHCE-Aashiq-Sadik-Basha-Shaikh.pdf",
+            "pdf": "files/RHCE-certificate.pdf",
         },
         {
             "name": "Red Hat Certified System Administrator",
@@ -320,7 +319,7 @@ RESUME = {
             "issued": "02 January 2023",
             "cert_id": "220-172-050",
             "verify": "https://www.credly.com/badges/60d9ce86-e4ab-46d8-b235-fa0d14a3ad3a",
-            "pdf": "files/RHCSA-Aashiq-Sadik-Basha-Shaikh.pdf",
+            "pdf": "files/RHCSA-certificate.pdf",
         },
     ],
 

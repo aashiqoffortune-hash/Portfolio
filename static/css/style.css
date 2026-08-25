@@ -19,12 +19,12 @@
   --ink:      #100e0c;
   --ink-2:    #16130f;
   --ink-3:    #1e1915;
-  --ink-4:    #262019;
+  --ink-4:    #6a5d4f;
 
   /* text */
   --bone:     #eae4d9;
   --bone-2:   #a8a094;
-  --bone-3:   #736c62;
+  --bone-3:   #8a8276;
 
   /* structure */
   --rule:     #2b2520;
@@ -137,7 +137,7 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
 .rail-index a.on { color: var(--bone); }
 .rail-index a.on::before { width: 9px; background: var(--sig); height: 2px; }
 .rail-index .n { color: var(--bone-3); font-size: 0.68rem; }
-.rail-index a.on .n { color: var(--sig); }
+.rail-index a.on .n { color: var(--sig-lift); }
 
 .rail-foot { margin-top: auto; display: flex; flex-direction: column; gap: 7px; }
 .rail-foot a, .rail-foot span {
@@ -265,7 +265,7 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
 .link-mark { position: relative; }
 .link-stage {
   display: block; font-family: var(--mono); font-size: 0.66rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.16em; color: var(--sig);
+  text-transform: uppercase; letter-spacing: 0.16em; color: var(--sig-lift);
   margin-bottom: 10px;
 }
 .link-n {
@@ -275,7 +275,7 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
   font-variant-numeric: tabular-nums;
   transition: color 0.3s ease;
 }
-.link:hover .link-n { color: var(--bone-3); }
+.link:hover .link-n { color: var(--bone-2); }
 
 .link-phase { font-size: 1.42rem; text-transform: uppercase; margin-bottom: 16px; }
 .link-body { display: grid; gap: 14px; max-width: var(--col); }
@@ -399,7 +399,7 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
 .kit:last-child { border-bottom: 1px solid var(--rule); }
 .kit-name {
   font-family: var(--mono); font-size: 0.74rem; font-weight: 500;
-  text-transform: uppercase; letter-spacing: 0.13em; color: var(--sig);
+  text-transform: uppercase; letter-spacing: 0.13em; color: var(--sig-lift);
   padding-top: 3px;
 }
 .kit .tags { margin-top: 0; }
@@ -584,4 +584,9 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
   .rail, .bar, .mast-acts, .cred-acts { display: none !important; }
   .column { margin-left: 0; }
   .section, .link, .tool, .cred { page-break-inside: avoid; }
+}
+
+.creds-note {
+  margin-top: 18px;
+  font-family: var(--mono); font-size: 0.72rem; color: var(--bone-3);
 }
