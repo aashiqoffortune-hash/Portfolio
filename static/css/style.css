@@ -15,25 +15,31 @@
    ══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ground */
-  --ink:      #100e0c;
-  --ink-2:    #16130f;
-  --ink-3:    #1e1915;
+  /* ground — near-black, warm-biased, deep enough that the page reads as
+     a lit surface rather than a coloured one */
+  --ink:      #0a0908;
+  --ink-2:    #100e0e;
+  --ink-3:    #15120f;
   --ink-4:    #6a5d4f;
 
   /* text */
-  --bone:     #eae4d9;
-  --bone-2:   #a8a094;
-  --bone-3:   #8a8276;
+  --bone:     #ece6db;
+  --bone-2:   #a09889;
+  --bone-3:   #857d70;
 
   /* structure */
-  --rule:     #2b2520;
-  --rule-2:   #3a322a;
+  --rule:     #221d1a;
+  --rule-2:   #342c26;
 
-  /* signal */
-  --sig:      #c8362c;
-  --sig-lift: #e04b3d;
-  --brass:    #c99a4a;
+  /* signal — deep arterial red carries the structure; the hot variant is
+     reserved for emphasis, so the two reds read as different intents */
+  --sig:      #c0261c;
+  --sig-lift: #ef4b38;
+  --brass:    #c9a05a;
+
+  /* atmosphere */
+  --grain:    0.035;
+  --vignette: 0.55;
 
   --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --prose:   "Newsreader", Georgia, "Times New Roman", serif;
@@ -82,6 +88,40 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
   left: 12px; top: 12px; z-index: 100;
   background: var(--sig); color: #fff; padding: 10px 16px;
   font-family: var(--mono); font-size: 0.8rem;
+}
+
+/* ── Atmosphere ───────────────────────────────────────────────────
+   Two fixed, non-interactive layers: a fine grain that keeps large dark
+   areas from reading as flat fill, and a vignette so the light falls off
+   toward the edges instead of lighting the page evenly. */
+
+body::before,
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+body::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: var(--grain);
+  mix-blend-mode: overlay;
+}
+
+body::after {
+  background: radial-gradient(ellipse 118% 88% at 50% 26%,
+              transparent 38%, rgba(0, 0, 0, var(--vignette)) 100%);
+}
+
+/* Content sits above the atmosphere. */
+.rail { z-index: 40; }
+.column { position: relative; z-index: 1; }
+
+/* A low heat behind the masthead — the one place the red is ambient
+   rather than structural. */
+.mast::before {
+  /* Kept inside the container: bleeding it sideways widened the document
+     and produced horizontal scroll on narrow viewports. */
+  content: ""; position: absolute; inset: -120px 0 auto 0; height: 620px;
+  background: radial-gradient(ellipse 68% 62% at 6% 6%,
+              rgba(192, 38, 28, 0.13), transparent 68%);
+  pointer-events: none; z-index: -1;
 }
 
 /* ── Shared atoms ─────────────────────────────────────────────── */
@@ -582,6 +622,7 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
   }
   body { background: #fff; color: #000; }
   .rail, .bar, .mast-acts, .cred-acts { display: none !important; }
+  body::before, body::after, .mast::before { display: none !important; }
   .column { margin-left: 0; }
   .section, .link, .tool, .cred { page-break-inside: avoid; }
 }
