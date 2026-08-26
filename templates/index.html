@@ -105,50 +105,6 @@
   <p class="tools-note">Source at <a href="{{ profile.github }}" rel="noopener">github.com/{{ profile.github_handle }}</a></p>
 </section>
 
-<!-- ══ Writeups ══════════════════════════════════════════════════ -->
-<section class="inner section" id="writeups">
-  {{ head('Findings',
-          'Writeups',
-          'Each finding as a claim, the evidence for it, then the artifact in the
-           code that carries it — grounded in salvo, verifiable in the repository.') }}
-
-  <p class="wu-intro">{{ r.writeups.intro }}</p>
-
-  <ol class="wu-list">
-    {% for w in r.writeups.entries %}
-    <li class="wu" id="wu-{{ w.id }}">
-      <div class="wu-n" aria-hidden="true">{{ "%02d"|format(loop.index) }}</div>
-      <div class="wu-body">
-        <h3 class="wu-title">{{ w.title }}</h3>
-
-        <div class="wu-step wu-claim">
-          <span class="wu-label">Claim</span>
-          <p>{{ w.claim|safe }}</p>
-        </div>
-        <div class="wu-step wu-evidence">
-          <span class="wu-label">Evidence</span>
-          <p>{{ w.evidence|safe }}</p>
-        </div>
-        <div class="wu-step wu-artifact">
-          <span class="wu-label">Artifact</span>
-          <p>{{ w.artifact|safe }}</p>
-        </div>
-
-        {% if w.verify %}
-        <div class="wu-verify">
-          <code>{{ w.verify }}</code>
-          {% if w.verify_note %}<span class="wu-verify-note">{{ w.verify_note|safe }}</span>{% endif %}
-        </div>
-        {% endif %}
-      </div>
-    </li>
-    {% endfor %}
-  </ol>
-
-  <p class="wu-close">{{ r.writeups.close|safe }}</p>
-  <p class="tools-note">Source at <a href="{{ r.writeups.url }}" rel="noopener">{{ r.writeups.url|replace('https://', '') }}</a></p>
-</section>
-
 
 <!-- ══ Background ════════════════════════════════════════════════ -->
 <section class="inner section" id="background">

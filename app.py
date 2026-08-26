@@ -7,7 +7,7 @@ Build the static site:   python freeze.py
 import os
 from pathlib import Path
 
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 
 from data.resume import RESUME
 
@@ -43,6 +43,22 @@ def inject_resume():
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/writeups/")
+def writeups():
+    # The rail on this page indexes the findings themselves and points its
+    # brand back to the portfolio home.
+    rail_nav = [
+        {"id": "wu-" + e["id"], "label": e["nav"]}
+        for e in RESUME["writeups"]["entries"]
+    ]
+    return render_template(
+        "writeups.html",
+        rail_nav=rail_nav,
+        home_route="index",
+        rail_role="Writeups",
+    )
 
 
 @app.route("/robots.txt")

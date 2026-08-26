@@ -733,3 +733,37 @@ body::after {
   .wu-step { padding-left: 0; padding-top: 22px; }
   .wu-label { position: static; display: block; margin-bottom: 6px; }
 }
+
+/* ── Writeups page ────────────────────────────────────────────────
+   The findings live on their own page; these style the page shell and
+   the rail's page-link entry that reaches it. */
+
+.rail-page .ra,
+.rail-index a .ra { color: var(--sig-lift); }
+.rail-page:hover .ra { color: var(--sig-lift); }
+
+.back {
+  display: inline-block; margin-bottom: 30px;
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--bone-3); text-decoration: none;
+}
+.back:hover { color: var(--sig-lift); }
+.back span { color: var(--sig-lift); }
+
+.wu-mast { padding-block: 72px 64px; }
+.wu-page-name { font-size: clamp(2.6rem, 8vw, 5.4rem); }
+.wu-mast .mast-disc .sep { color: var(--sig-lift); }
+.wu-thesis {
+  margin-top: 40px;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem); color: var(--bone-2);
+}
+
+.wu-return {
+  margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--rule);
+}
+.wu-return a {
+  font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em;
+  text-transform: uppercase; text-decoration: none; color: var(--bone-2);
+}
+.wu-return a:hover { color: var(--sig-lift); }
+.wu-return span { color: var(--sig-lift); }

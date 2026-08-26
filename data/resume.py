@@ -220,6 +220,7 @@ RESUME = {
         "entries": [
             {
                 "id": "domain-flag",
+                "nav": "Silent blank cell",
                 "title": "A blank cell that reads as a closed port",
                 "claim": (
                     "A wrapper that fans one credential across every protocol can "
@@ -245,6 +246,7 @@ RESUME = {
             },
             {
                 "id": "local-auth",
+                "nav": "Wasted logon",
                 "title": "A flag that spends a logon it was never going to use",
                 "claim": (
                     "<code>--local-auth</code> on LDAP does not merely fail. It burns an "
@@ -269,6 +271,7 @@ RESUME = {
             },
             {
                 "id": "timeout",
+                "nav": "Ignored timeout",
                 "title": "A timeout the tool accepts and silently ignores",
                 "claim": (
                     "NetExec\u2019s global <code>--timeout</code> is deprecated and does "
@@ -292,6 +295,7 @@ RESUME = {
             },
             {
                 "id": "pwn3d",
+                "nav": "Pwn3d meanings",
                 "title": "One word, several unrelated meanings",
                 "claim": (
                     "NetExec prints <code>Pwn3d!</code> for conditions that are not the "
@@ -315,6 +319,7 @@ RESUME = {
             },
             {
                 "id": "three-buckets",
+                "nav": "Verdict buckets",
                 "title": "The credential two-state logic throws away",
                 "claim": (
                     "Most tooling records worked or failed. Everything else collapses into "
@@ -485,7 +490,7 @@ RESUME = {
     "nav": [
         {"id": "engagement", "label": "Engagement"},
         {"id": "tooling", "label": "Tooling"},
-        {"id": "writeups", "label": "Writeups"},
+        {"id": "writeups", "label": "Writeups", "route": "writeups", "arrow": True},
         {"id": "background", "label": "Background"},
         {"id": "arsenal", "label": "Arsenal"},
         {"id": "verify", "label": "Verify"},

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ profile.name }} — {{ profile.tagline }}{% endblock %}</title>
-  <meta name="description" content="{{ profile.meta_description }}">
+  <meta name="description" content="{% block description %}{{ profile.meta_description }}{% endblock %}">
   <meta name="author" content="{{ profile.name }}">
   <meta name="theme-color" content="#100e0c">
 
@@ -22,19 +22,28 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
+  {% set items = rail_nav if rail_nav is defined and rail_nav else nav %}
+
   {# Desktop: a fixed rail carrying identity and current position. #}
   <aside class="rail">
-    <a class="rail-mark" href="#top">
+    <a class="rail-mark" href="{% if home_route|default(false) %}{{ url_for(home_route) }}{% else %}#top{% endif %}">
       <span class="m-name">{{ profile.name }}</span>
-      <span class="m-role">{{ profile.tagline }}</span>
+      <span class="m-role">{{ rail_role|default(profile.tagline) }}</span>
     </a>
 
     <nav class="rail-index" aria-label="Sections">
-      {% for item in nav %}
-      <a href="#{{ item.id }}" data-sec="{{ item.id }}">
+      {% for item in items %}
+      {% if item.route %}
+      <a href="{{ url_for(item.route) }}" class="rail-page">
+        <span class="n">{{ "%02d"|format(loop.index) }}</span>
+        <span>{{ item.label }}{% if item.arrow|default(false) %} <span class="ra" aria-hidden="true">&rarr;</span>{% endif %}</span>
+      </a>
+      {% else %}
+      <a href="{{ item.home }}#{{ item.id }}" data-sec="{{ item.id }}">
         <span class="n">{{ "%02d"|format(loop.index) }}</span>
         <span>{{ item.label }}</span>
       </a>
+      {% endif %}
       {% endfor %}
     </nav>
 
@@ -47,12 +56,12 @@
 
   {# Mobile: the rail collapses to a bar. #}
   <div class="bar">
-    <a class="bar-mark" href="#top">{{ profile.name }}</a>
+    <a class="bar-mark" href="{% if home_route|default(false) %}{{ url_for(home_route) }}{% else %}#top{% endif %}">{{ profile.name }}</a>
     <button class="bar-btn" type="button" aria-expanded="false" aria-label="Toggle sections">
       <i></i><i></i><i></i>
     </button>
     <nav class="bar-menu" aria-label="Sections">
-      {% for item in nav %}<a href="#{{ item.id }}">{{ item.label }}</a>{% endfor %}
+      {% for item in items %}<a href="{% if item.route %}{{ url_for(item.route) }}{% else %}{{ item.home }}#{{ item.id }}{% endif %}">{{ item.label }}</a>{% endfor %}
     </nav>
   </div>
 
