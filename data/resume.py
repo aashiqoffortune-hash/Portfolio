@@ -2,7 +2,15 @@
 
 Templates read from RESUME only, so updating the portfolio means editing this
 file — no HTML changes required.
+
+The one thing that lives elsewhere is `data/demos.py`: the recorded terminal
+sessions on the salvo page, and the capability tables the page's command builder
+works from. Those are captured output and transcribed code rather than written
+copy, so they are kept apart from the prose and reach the templates through
+RESUME["salvo"] like everything else.
 """
+
+from data.demos import BUILDER, DEMOS, LOCKOUT_LAB, MATRIX_LAB
 
 RESUME = {
     "profile": {
@@ -196,6 +204,13 @@ RESUME = {
         "url": "https://github.com/aashiqoffortune-hash/salvo",
         "tagline": "One credential, every NetExec protocol, one honest matrix.",
         "stack": "Python, standard library only. No dependency beyond NetExec itself.",
+
+        # Recorded sessions and the three interactive labs. See data/demos.py
+        # for how each transcript was captured.
+        "demos": DEMOS,
+        "matrix": MATRIX_LAB,
+        "lockout": LOCKOUT_LAB,
+        "builder": BUILDER,
 
         # Why it exists — the problem, stated the way it actually bites.
         "problem": [
