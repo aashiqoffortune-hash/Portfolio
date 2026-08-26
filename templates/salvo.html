@@ -45,6 +45,53 @@
   </div>
 </section>
 
+<!-- ══ Watch it run ══════════════════════════════════════════════
+     Six recorded sessions. The transcripts are in the page as plain
+     text; the player only decides when each line appears, so with the
+     script disabled this section is six readable terminal dumps. -->
+<section class="inner section" id="demo">
+  <header class="s-head">
+    <span class="eyebrow">Recorded, not mocked</span>
+    <h2 class="s-title">Watch it run</h2>
+    <p class="s-sub">
+      Every byte below is real <code>salvo 1.0.0</code> output, captured by running
+      the tool against <code>tests/fake_nxc.py</code> — the harness in salvo&rsquo;s own
+      repository that emits genuine NetExec line shapes for a fixed cast of hosts.
+      Nothing here was typed to look like a terminal. The switches that harness
+      exposes are what make the failure paths — a lockout, a rejected command,
+      capability drift — reproducible on a page.
+    </p>
+  </header>
+
+  <div class="term" data-term>
+    <nav class="term-tabs" aria-label="Recorded sessions">
+      {% for d in s.demos %}
+      <a class="term-tab{% if loop.first %} on{% endif %}" href="#pane-{{ d.id }}"
+         data-pane="{{ d.id }}"><span class="term-tab-n">{{ "%02d"|format(loop.index) }}</span>{{ d.label }}</a>
+      {% endfor %}
+    </nav>
+
+    {% for d in s.demos %}
+    <article class="term-pane" id="pane-{{ d.id }}" data-pane="{{ d.id }}">
+      <p class="term-note">{{ d.note|safe }}</p>
+
+      <div class="term-win" data-win>
+        <div class="term-bar">
+          <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="term-name">kali@kali:~ — {{ d.label|lower }}</span>
+          <span class="term-ctl" data-ctl></span>
+        </div>
+        <div class="term-body" data-body>
+          <p class="term-cmd"><span class="term-ps1" aria-hidden="true">$</span><span
+             class="term-typed" data-cmd>{{ d.cmd }}</span><span class="term-caret" data-caret hidden aria-hidden="true"></span></p>
+          <pre class="term-out" data-out>{{ d.transcript|terminal }}</pre>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
 <!-- ══ The claims, with evidence ═════════════════════════════════ -->
 <section class="inner section" id="claims">
   <header class="s-head">
@@ -69,6 +116,225 @@
   </ol>
 </section>
 
+<!-- ══ Try it yourself ═══════════════════════════════════════════
+     Three working panels, one per claim that can be checked rather
+     than believed. Each opens on real output and stays useful with
+     the script disabled: the controls simply stop recomputing. -->
+<section class="inner section" id="lab">
+  <header class="s-head">
+    <span class="eyebrow">Working, on this page</span>
+    <h2 class="s-title">Try it yourself</h2>
+    <p class="s-sub">
+      Three of the four claims above can be checked here, without installing
+      anything. Read a verdict, price a spray, and build the exact NetExec
+      command lines salvo would send.
+    </p>
+  </header>
+
+  <!-- ── Lab 1 · reading the matrix ─────────────────────────── -->
+  <div class="lab" id="lab-matrix" data-lab="matrix">
+    <div class="lab-head">
+      <span class="lab-tag">Claims 01 &amp; 02 · what a cell means</span>
+      <h3 class="lab-title">Read the matrix</h3>
+      <p class="lab-sub">
+        The grid printed by the recorded sweep, cell for cell. Pick any one and
+        it shows the nxc line that produced it, what that line actually proves,
+        and the command it earns.
+      </p>
+    </div>
+
+    <div class="mx-wrap">
+      <table class="mx">
+        <caption class="mx-cap">{{ s.matrix.cred }}</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="mx-h">host</th>
+            {% for p in s.matrix.protocols %}<th scope="col">{{ p }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in s.matrix.rows %}
+          <tr>
+            <th scope="row" class="mx-h">{{ row.host }} <span class="mx-name">({{ row.name }})</span></th>
+            {% for c in row.cells %}
+            {% set sl = s.matrix.slugs[c] %}
+            <td><a class="cell g-{{ sl }}" href="#v-{{ sl }}" data-v="{{ sl }}"
+                   title="{{ c }} — what this cell means">{{ c }}</a></td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p class="mx-more">
+      <span class="mx-more-lab">Also in the legend</span>
+      {% for v in s.matrix.verdicts %}{% if v.slug not in ('admin', 'ok', 'blocked', 'unknown', 'none') %}<a
+        class="cell g-{{ v.slug }}" href="#v-{{ v.slug }}" data-v="{{ v.slug }}">{{ v.key }}</a>{% endif %}{% endfor %}
+    </p>
+
+    <div class="vlist" data-vlist>
+      {% for v in s.matrix.verdicts %}
+      <article class="vcard k-{{ v.kind }}" id="v-{{ v.slug }}" data-v="{{ v.slug }}">
+        <p class="v-head">
+          <span class="cell g-{{ v.slug }}" aria-hidden="true">{{ v.key }}</span>
+          <span class="v-name">{{ v.name }}</span>
+          <span class="v-kind">{{ s.matrix.kinds[v.kind] }}</span>
+        </p>
+        <p class="v-row"><span class="v-lab">nxc printed</span><code>{{ v.line }}</code></p>
+        <p class="v-means">{{ v.means|safe }}</p>
+        <p class="v-row v-then"><span class="v-lab">So do this</span><span>{{ v.do|safe }}</span></p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ── Lab 2 · the lockout arithmetic ─────────────────────── -->
+  {% set lk = s.lockout %}
+  {% set lk_jobs = lk.default_protocols|length %}
+  {% set lk_worst = lk_jobs * lk.hosts %}
+  <div class="lab" id="lab-lockout" data-lab="lockout">
+    <div class="lab-head">
+      <span class="lab-tag">Claim 03 · lockout counted</span>
+      <h3 class="lab-title">Price the spray before you pay for it</h3>
+      <p class="lab-sub">
+        salvo&rsquo;s own arithmetic with the inputs left open. Move the scope, drop
+        protocols, set the threshold you were given — this is the block it prints
+        before it spends a single logon.
+      </p>
+    </div>
+
+    <div class="lab-grid">
+      <div class="lab-ctls">
+        <label class="ctl">
+          <span class="ctl-lab">Hosts in scope <b data-out="hosts">{{ lk.hosts }}</b></span>
+          <input type="range" min="1" max="254" value="{{ lk.hosts }}" data-in="hosts">
+        </label>
+        <label class="ctl">
+          <span class="ctl-lab">Credentials <b data-out="creds">{{ lk.creds }}</b></span>
+          <input type="range" min="1" max="{{ lk.accounts|length }}" value="{{ lk.creds }}" data-in="creds">
+        </label>
+        <label class="ctl">
+          <span class="ctl-lab">Lockout threshold <b data-out="thr">{{ lk.threshold }}</b></span>
+          <input type="range" min="3" max="20" value="{{ lk.threshold }}" data-in="thr">
+        </label>
+
+        <fieldset class="chips">
+          <legend class="ctl-lab">Protocols <b data-out="nproto">{{ lk_jobs }}</b></legend>
+          {% for p in lk.protocols %}
+          <label class="chip"><input type="checkbox" value="{{ p }}" data-in="proto"
+            {% if p in lk.default_protocols %}checked{% endif %}><span>{{ p }}</span></label>
+          {% endfor %}
+        </fieldset>
+      </div>
+
+      <div class="lab-out">
+        <pre class="term-out lab-pre" data-out="lockout"><span class="tl k-warn">[!] LOCKOUT MATH - each protocol against each host is a separate logon,</span><span class="tl k-plain">    and a domain account's counter lives on the DC, so every host counts.</span><span class="tl k-plain">      {{ "%-24s"|format(lk.accounts[0]) }} up to {{ lk_worst }} logons ({{ lk_jobs }} protocol-jobs x {{ lk.hosts }} hosts)</span><span class="tl k-plain">    Default AD lockout threshold is often {{ lk.threshold }}. Check it first:</span><span class="tl k-plain">        nxc smb &lt;DC_IP&gt; -u '' -p '' --pass-pol</span><span class="tl k-plain">    Narrow with -P smb,winrm, or spread it out with --stealth.</span></pre>
+        <p class="lab-verdict over" data-out="verdict">
+          {{ lk_worst }} logons against a threshold of {{ lk.threshold }}.
+          That account locks {{ (lk_worst / lk.threshold)|round(0, 'floor')|int }}× over.
+        </p>
+        <p class="lab-foot">{{ lk.note }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lab 3 · the command builder ────────────────────────── -->
+  {% set b = s.builder %}
+  <div class="lab" id="lab-build" data-lab="build">
+    <div class="lab-head">
+      <span class="lab-tag">Claim 04 · no silent lies</span>
+      <h3 class="lab-title">Build the commands</h3>
+      <p class="lab-sub">
+        <code>--dry-run</code>, in the page. It opens on salvo&rsquo;s real output for
+        these inputs — the same eight lines the recorded dry run prints — and
+        rebuilds them from the capability tables as you change anything. Take the
+        domain off ssh, ask for a hash over ftp, switch to local auth with ldap
+        selected, and watch which flags salvo refuses to send.
+      </p>
+    </div>
+
+    <div class="lab-grid">
+      <div class="lab-ctls">
+        <label class="ctl">
+          <span class="ctl-lab">Targets</span>
+          <input type="text" value="{{ b.seed.targets }}" data-in="targets" spellcheck="false">
+        </label>
+        <label class="ctl">
+          <span class="ctl-lab">Username</span>
+          <input type="text" value="{{ b.seed.user }}" data-in="user" spellcheck="false">
+        </label>
+        <div class="ctl">
+          <span class="ctl-lab">Secret</span>
+          <div class="ctl-split">
+            <select data-in="kind" aria-label="Secret type">
+              <option value="p" selected>password</option>
+              <option value="H">NT hash</option>
+            </select>
+            <input type="text" value="{{ b.seed.secret }}" data-in="secret" spellcheck="false">
+          </div>
+        </div>
+        <label class="ctl">
+          <span class="ctl-lab">Domain</span>
+          <input type="text" value="{{ b.seed.domain }}" data-in="domain" spellcheck="false">
+        </label>
+        <div class="ctl ctl-row">
+          <label class="chip chip-wide"><input type="checkbox" data-in="local"><span>--local-auth</span></label>
+          <label class="ctl-sel"><span class="ctl-lab">Preset</span>
+            <select data-in="preset">
+              <option value="" selected>default</option>
+              <option value="slow">--slow</option>
+              <option value="stealth">--stealth</option>
+            </select>
+          </label>
+        </div>
+
+        <fieldset class="chips">
+          <legend class="ctl-lab">Protocols <b data-out="bproto">{{ b.seed.protocols|length }}</b></legend>
+          {% for p in b.protocols %}
+          <label class="chip"><input type="checkbox" value="{{ p }}" data-in="bproto"
+            {% if p in b.seed.protocols %}checked{% endif %}><span>{{ p }}</span></label>
+          {% endfor %}
+        </fieldset>
+      </div>
+
+      <div class="lab-out">
+        <div class="term-win">
+          <div class="term-bar">
+            <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="term-name">kali@kali:~ — dry run</span>
+            <span class="term-ctl" data-ctl-copy></span>
+          </div>
+          <div class="term-body">
+            <p class="term-cmd"><span class="term-ps1" aria-hidden="true">$</span><span
+               class="term-typed" data-out="salvocmd">salvo {{ b.seed.targets }} -u {{ b.seed.user }} -p '{{ b.seed.secret }}' -d {{ b.seed.domain }} --dry-run</span></p>
+            <pre class="term-out lab-pre" data-out="build">{{ b.seed_output|terminal }}</pre>
+          </div>
+        </div>
+        <p class="lab-foot" data-out="buildnote">
+          Eight jobs, eight command lines. <code>ssh</code> and <code>ftp</code> get no
+          <code>-d</code> — their nxc parsers define none, and passing it would make
+          argparse exit before a packet was sent.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {# The capability tables and account names the two computed labs recalculate
+     from. Both panels render their opening state on the server, so this is
+     only ever an upgrade. #}
+  <script type="application/json" id="salvo-data">{{ {
+    "domain_capable": b.domain_capable,
+    "local_auth_capable": b.local_auth_capable,
+    "hash_capable": b.hash_capable,
+    "timeout_flag": b.timeout_flag,
+    "defaults": b.defaults,
+    "presets": b.presets,
+    "notes": b.notes,
+    "accounts": lk.accounts
+  }|tojson }}</script>
+</section>
+
 <!-- ══ Run the evidence ══════════════════════════════════════════ -->
 <section class="inner section" id="run">
   <header class="s-head">
@@ -90,4 +356,11 @@
   <p class="wu-return"><a href="{{ url_for('index') }}"><span aria-hidden="true">&larr;</span> Back to the portfolio</a></p>
 </section>
 
+{% endblock %}
+
+{% block scripts %}
+{# The player and the three labs. Everything they touch is already rendered
+   above; if this file never loads, the page loses playback and recalculation
+   and keeps all of its content. #}
+<script src="{{ url_for('static', filename='js/salvo.js') }}" defer></script>
 {% endblock %}
