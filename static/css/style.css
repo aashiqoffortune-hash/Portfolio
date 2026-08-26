@@ -652,3 +652,84 @@ body::after {
   margin-top: 18px;
   font-family: var(--mono); font-size: 0.72rem; color: var(--bone-3);
 }
+
+/* ── Writeups ─────────────────────────────────────────────────────
+   Claim → evidence → artifact. Three labelled steps per finding, the
+   artifact carrying the accent as the payoff of the sequence. */
+
+.wu-intro {
+  max-width: var(--col); color: var(--bone-2); font-size: 1.05rem;
+  margin-bottom: 40px;
+}
+
+.wu-list { display: grid; gap: 0; counter-reset: wu; }
+
+.wu {
+  display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 34px;
+  padding: 40px 0; border-top: 1px solid var(--rule);
+}
+.wu:first-child { border-top: 1px solid var(--rule-2); }
+.wu:last-child { border-bottom: 1px solid var(--rule); }
+
+.wu-n {
+  font-family: var(--display); font-weight: 900; font-stretch: 120%;
+  font-size: 3.2rem; line-height: 1; letter-spacing: -0.045em;
+  color: var(--ink-4); font-variant-numeric: tabular-nums;
+}
+
+.wu-title {
+  font-size: 1.42rem; text-transform: uppercase; margin-bottom: 24px;
+  max-width: 32ch;
+}
+
+.wu-step {
+  position: relative; padding-left: 108px; margin-bottom: 18px;
+  max-width: var(--col);
+}
+.wu-step:last-of-type { margin-bottom: 0; }
+.wu-step p { color: var(--bone-2); font-size: 0.98rem; }
+
+.wu-label {
+  position: absolute; left: 0; top: 4px;
+  font-family: var(--mono); font-size: 0.64rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--bone-3);
+}
+
+/* The three steps escalate: claim states, evidence proves, artifact is
+   where the accent lands — a left rule that only the artifact carries. */
+.wu-artifact { padding-top: 4px; }
+.wu-artifact p { color: var(--bone); }
+.wu-artifact .wu-label { color: var(--sig-lift); }
+.wu-claim p { color: var(--bone); }
+
+.wu-step code {
+  font-family: var(--mono); font-size: 0.86em; color: var(--brass);
+  background: var(--ink-3); border: 1px solid var(--rule);
+  border-radius: 3px; padding: 1px 5px;
+}
+
+.wu-verify {
+  margin-top: 20px; padding: 12px 16px;
+  background: var(--ink-2); border-left: 2px solid var(--sig);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px;
+}
+.wu-verify > code {
+  font-family: var(--mono); font-size: 0.82rem; color: var(--bone);
+}
+.wu-verify > code::before { content: "$ "; color: var(--sig-lift); }
+.wu-verify-note {
+  font-family: var(--mono); font-size: 0.72rem; color: var(--bone-3);
+}
+
+.wu-close {
+  margin-top: 40px; max-width: var(--col);
+  color: var(--bone-2); font-size: 0.98rem;
+}
+
+@media (max-width: 1000px) {
+  .wu { grid-template-columns: 1fr; gap: 16px; }
+  .wu-n { font-size: 1.9rem; }
+  .wu-step { padding-left: 0; padding-top: 22px; }
+  .wu-label { position: static; display: block; margin-bottom: 6px; }
+}

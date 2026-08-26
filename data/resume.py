@@ -204,6 +204,147 @@ RESUME = {
         },
     ],
 
+    # Engineering writeups — claim, then the evidence for it, then the artifact
+    # in the code that carries it. Every artifact reference is a real construct
+    # in salvo.py, verifiable in the repository.
+    "writeups": {
+        "project": "salvo",
+        "url": "https://github.com/aashiqoffortune-hash/salvo",
+        "intro": (
+            "salvo builds NetExec command lines, so it has to know exactly which "
+            "flags each protocol defines. Getting that wrong throws no error — it "
+            "produces a blank cell that reads as \u201cnothing listening there.\u201d "
+            "Three of these were root-caused by reading NetExec\u2019s source rather "
+            "than by trial."
+        ),
+        "entries": [
+            {
+                "id": "domain-flag",
+                "title": "A blank cell that reads as a closed port",
+                "claim": (
+                    "A wrapper that fans one credential across every protocol can "
+                    "report a live host as dead — with no error to notice — the moment "
+                    "it passes a flag the target protocol\u2019s parser never defined."
+                ),
+                "evidence": (
+                    "ssh, ftp, nfs and vnc have no domain concept and no <code>-d</code> "
+                    "argument. Pass one and NetExec\u2019s argparse exits with a usage "
+                    "error before a single packet leaves the host. The job produces "
+                    "nothing parseable, and the cell renders <code>-</code> — which any "
+                    "operator reads as \u201cport closed,\u201d not \u201cthe wrapper "
+                    "built a broken command.\u201d The wrong conclusion is silent."
+                ),
+                "artifact": (
+                    "<code>DOMAIN_CAPABLE = {smb, winrm, wmi, mssql, ldap, rdp}</code>. "
+                    "salvo withholds <code>-d</code> for the four domainless protocols and "
+                    "says so beneath the matrix, because a bare username is a different "
+                    "test from a domain one."
+                ),
+                "verify": "salvo --check-nxc -P all",
+                "verify_note": "diffs the table against nxc &lt;proto&gt; --help on the installed build",
+            },
+            {
+                "id": "local-auth",
+                "title": "A flag that spends a logon it was never going to use",
+                "claim": (
+                    "<code>--local-auth</code> on LDAP does not merely fail. It burns an "
+                    "authentication attempt against the account lockout counter — the one "
+                    "resource an engagement cannot get back."
+                ),
+                "evidence": (
+                    "LDAP accepts <code>-d</code> but not <code>--local-auth</code>, "
+                    "because a directory bind is inherently domain-scoped. It sat in the "
+                    "local-auth set and should not have. Each wasted attempt counts against "
+                    "a threshold that is often five, tracked on the domain controller "
+                    "regardless of which member server the request touched."
+                ),
+                "artifact": (
+                    "<code>LOCAL_AUTH_CAPABLE = {smb, winrm, wmi, mssql, rdp}</code> — LDAP "
+                    "removed. salvo prints the lockout arithmetic before the run and the "
+                    "attempts actually made after it, since a <code>-</code> cell never "
+                    "reached authentication."
+                ),
+                "verify": "salvo <targets> -C creds.txt -d corp.local  # lockout math printed first",
+                "verify_note": "",
+            },
+            {
+                "id": "timeout",
+                "title": "A timeout the tool accepts and silently ignores",
+                "claim": (
+                    "NetExec\u2019s global <code>--timeout</code> is deprecated and does "
+                    "nothing. A wrapper that keeps passing it inherits two-second defaults "
+                    "that report live hosts as dead over any real latency."
+                ),
+                "evidence": (
+                    "NetExec\u2019s own help says the flag is \u201cno longer used, "
+                    "replaced by per-protocol timeouts.\u201d The replacements default hard: "
+                    "SMB and RPC at 2s, LDAP at 3s — short enough to time out on tunnel "
+                    "latency and render a reachable host as a dead one."
+                ),
+                "artifact": (
+                    "A <code>TIMEOUT_FLAG</code> map emits the per-protocol flag instead — "
+                    "<code>--smb-timeout</code>, <code>--http-timeout</code>, "
+                    "<code>--rpc-timeout</code>, and the rest. ftp, vnc and ldap expose no "
+                    "timeout flag at all, and salvo encodes that gap rather than guessing."
+                ),
+                "verify": "salvo --slow 10.10.100.0/24 -C creds.txt -d corp.local",
+                "verify_note": "tunnel preset that raises every per-protocol timeout at once",
+            },
+            {
+                "id": "pwn3d",
+                "title": "One word, several unrelated meanings",
+                "claim": (
+                    "NetExec prints <code>Pwn3d!</code> for conditions that are not the "
+                    "same thing. Collapsing them into one verdict is how a standard-user "
+                    "shell gets mistaken for domain admin."
+                ),
+                "evidence": (
+                    "On smb, <code>Pwn3d!</code> proves write access to ADMIN$ — real local "
+                    "admin. On winrm it proves only that the account is in Remote Management "
+                    "Users, which grants execution with no admin rights whatsoever. Reading "
+                    "those as equal writes a false privilege level into the notes."
+                ),
+                "artifact": (
+                    "A per-protocol meaning table renders smb and mssql admin as "
+                    "<code>ADMIN</code>, and winrm/ssh/wmi execution as <code>exec</code>. "
+                    "When no protocol proved admin on a host, the follow-up line says so in "
+                    "words rather than leaving it to be assumed."
+                ),
+                "verify": "",
+                "verify_note": "",
+            },
+            {
+                "id": "three-buckets",
+                "title": "The credential two-state logic throws away",
+                "claim": (
+                    "Most tooling records worked or failed. Everything else collapses into "
+                    "failed — which is how a provably correct password gets discarded."
+                ),
+                "evidence": (
+                    "A password can be correct while the access path is closed: "
+                    "STATUS_LOGON_TYPE_NOT_GRANTED, account disabled, password expired, "
+                    "logon-hour and workstation restrictions all mean the credential checked "
+                    "out. A WinRM refusal is byte-identical whether the account is valid but "
+                    "unprivileged or the password is simply wrong."
+                ),
+                "artifact": (
+                    "Three verdict buckets — valid, blocked (<code>VALID*</code>), unknown "
+                    "(<code>?</code>). A NOT A VERDICT block under the matrix lists every "
+                    "blocked and unknown result with its reason; a credential in that list "
+                    "is still live and named as such."
+                ),
+                "verify": "",
+                "verify_note": "",
+            },
+        ],
+        "close": (
+            "Both audit paths — <code>--selftest</code> for the output parser, "
+            "<code>--check-nxc</code> for the capability tables — are meant to run "
+            "after any NetExec upgrade, so drift surfaces as a failed check rather "
+            "than a wrong cell in the field."
+        ),
+    },
+
     "professional_experience": [
         {
             "role": "Linux System Administrator / Infrastructure Engineer",
@@ -344,6 +485,7 @@ RESUME = {
     "nav": [
         {"id": "engagement", "label": "Engagement"},
         {"id": "tooling", "label": "Tooling"},
+        {"id": "writeups", "label": "Writeups"},
         {"id": "background", "label": "Background"},
         {"id": "arsenal", "label": "Arsenal"},
         {"id": "verify", "label": "Verify"},
