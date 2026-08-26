@@ -6,7 +6,8 @@
   <title>{% block title %}{{ profile.name }} — {{ profile.tagline }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{{ profile.meta_description }}{% endblock %}">
   <meta name="author" content="{{ profile.name }}">
-  <meta name="theme-color" content="#100e0c">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e1013" media="(prefers-color-scheme: dark)">
 
   <meta property="og:type" content="profile">
   <meta property="og:title" content="{{ profile.name }} — {{ profile.tagline }}">
@@ -16,7 +17,7 @@
   <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:opsz,wght@6..72,300..600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -48,7 +49,7 @@
     </nav>
 
     <div class="rail-foot">
-      <span class="rail-status">Open to work</span>
+      <span class="rail-status">Available for work</span>
       <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
       <a href="{{ profile.github }}" rel="noopener">{{ profile.github_handle }}</a>
     </div>
