@@ -143,34 +143,15 @@ RESUME = {
             "kind": "Credential-spray orchestrator",
             "lang": "Python",
             "summary": (
-                "Wraps NetExec across eight protocols with concurrency control, "
-                "per-protocol timeout tuning, and resumable job state — plus the "
-                "operational security controls the wrapper exists for: request jitter, "
-                "process spacing, and a low-and-slow mode for environments where the "
-                "lockout policy is the real constraint."
+                "One credential fanned across every NetExec protocol at once, read "
+                "back as a single matrix with an honest verdict in each cell — built "
+                "to stop live access being lost to tooling that only knows worked or "
+                "failed, and to count every logon against lockout before it spends it."
             ),
-            "findings_intro": (
-                "Three argument-handling defects root-caused by reading NetExec upstream "
-                "source, rather than by trial:"
-            ),
-            "findings": [
-                {
-                    "flag": "--domain",
-                    "text": "Undefined on non-domain protocols, which caused live hosts to be reported as dead.",
-                },
-                {
-                    "flag": "--local-auth",
-                    "text": "Invalid on LDAP, and consumed logon attempts against account lockout policy.",
-                },
-                {
-                    "flag": "global timeout",
-                    "text": "Deprecated and silently ignored in favour of two-second per-protocol defaults.",
-                },
-            ],
-            "footer": (
-                "Ships with a self-test harness and a capability audit that revalidates "
-                "the tool against whatever NetExec build is installed."
-            ),
+            "findings_intro": "",
+            "findings": [],
+            "footer": "",
+            "case": True,
             "tags": ["Python", "NetExec", "OPSEC", "Concurrency"],
         },
         {
@@ -207,146 +188,131 @@ RESUME = {
     # Engineering writeups — claim, then the evidence for it, then the artifact
     # in the code that carries it. Every artifact reference is a real construct
     # in salvo.py, verifiable in the repository.
-    "writeups": {
-        "project": "salvo",
+    # The case for salvo, in the builder's voice — why it exists, what it
+    # does, and the evidence behind each claim it makes. Written to be read
+    # by someone deciding whether the tool is worth their time.
+    "salvo": {
+        "name": "salvo",
         "url": "https://github.com/aashiqoffortune-hash/salvo",
-        "intro": (
-            "salvo builds NetExec command lines, so it has to know exactly which "
-            "flags each protocol defines. Getting that wrong throws no error — it "
-            "produces a blank cell that reads as \u201cnothing listening there.\u201d "
-            "Three of these were root-caused by reading NetExec\u2019s source rather "
-            "than by trial."
-        ),
-        "entries": [
+        "tagline": "One credential, every NetExec protocol, one honest matrix.",
+        "stack": "Python, standard library only. No dependency beyond NetExec itself.",
+
+        # Why it exists — the problem, stated the way it actually bites.
+        "problem": [
+            "NetExec tests one protocol per invocation. Validating a single "
+            "credential properly means running it eight times — SMB, WinRM, WMI, "
+            "MSSQL, LDAP, RDP, SSH, FTP — and reading eight separate scrollbacks. "
+            "Point that at a subnet with a handful of credentials and it is "
+            "hundreds of windows to eyeball, by hand, under a clock.",
+            "The thing you are reading back is lossy. A password that is correct "
+            "but blocked looks identical to a wrong one, so live access gets filed "
+            "as failure and thrown away. And a single word — <code>Pwn3d!</code> — "
+            "is printed for conditions as different as write access to a domain "
+            "controller and permission to open a shell as a nobody. I built salvo "
+            "because credential validation at scale is exactly where real access "
+            "goes missing, lost to tooling that only knows two answers.",
+        ],
+
+        # What it does — the short version, three moves.
+        "does": [
             {
-                "id": "domain-flag",
-                "nav": "Silent blank cell",
-                "title": "A blank cell that reads as a closed port",
-                "claim": (
-                    "A wrapper that fans one credential across every protocol can "
-                    "report a live host as dead — with no error to notice — the moment "
-                    "it passes a flag the target protocol\u2019s parser never defined."
-                ),
-                "evidence": (
-                    "ssh, ftp, nfs and vnc have no domain concept and no <code>-d</code> "
-                    "argument. Pass one and NetExec\u2019s argparse exits with a usage "
-                    "error before a single packet leaves the host. The job produces "
-                    "nothing parseable, and the cell renders <code>-</code> — which any "
-                    "operator reads as \u201cport closed,\u201d not \u201cthe wrapper "
-                    "built a broken command.\u201d The wrong conclusion is silent."
-                ),
-                "artifact": (
-                    "<code>DOMAIN_CAPABLE = {smb, winrm, wmi, mssql, ldap, rdp}</code>. "
-                    "salvo withholds <code>-d</code> for the four domainless protocols and "
-                    "says so beneath the matrix, because a bare username is a different "
-                    "test from a domain one."
-                ),
-                "verify": "salvo --check-nxc -P all",
-                "verify_note": "diffs the table against nxc &lt;proto&gt; --help on the installed build",
+                "head": "Fans one credential across every protocol at once",
+                "body": "Runs the eight protocol jobs concurrently and collapses "
+                        "eight scrollbacks into a single matrix — one row per host, "
+                        "one column per protocol, read top to bottom in one look.",
             },
             {
-                "id": "local-auth",
-                "nav": "Wasted logon",
-                "title": "A flag that spends a logon it was never going to use",
-                "claim": (
-                    "<code>--local-auth</code> on LDAP does not merely fail. It burns an "
-                    "authentication attempt against the account lockout counter — the one "
-                    "resource an engagement cannot get back."
-                ),
-                "evidence": (
-                    "LDAP accepts <code>-d</code> but not <code>--local-auth</code>, "
-                    "because a directory bind is inherently domain-scoped. It sat in the "
-                    "local-auth set and should not have. Each wasted attempt counts against "
-                    "a threshold that is often five, tracked on the domain controller "
-                    "regardless of which member server the request touched."
-                ),
-                "artifact": (
-                    "<code>LOCAL_AUTH_CAPABLE = {smb, winrm, wmi, mssql, rdp}</code> — LDAP "
-                    "removed. salvo prints the lockout arithmetic before the run and the "
-                    "attempts actually made after it, since a <code>-</code> cell never "
-                    "reached authentication."
-                ),
-                "verify": "salvo <targets> -C creds.txt -d corp.local  # lockout math printed first",
-                "verify_note": "",
+                "head": "Prints an honest verdict in every cell",
+                "body": "Not worked-or-failed. Authenticated, provably "
+                        "administrative, blocked-but-valid, and genuinely-unknown are "
+                        "four different states, and salvo keeps them apart instead of "
+                        "flattening them into a lie.",
             },
             {
-                "id": "timeout",
-                "nav": "Ignored timeout",
-                "title": "A timeout the tool accepts and silently ignores",
-                "claim": (
-                    "NetExec\u2019s global <code>--timeout</code> is deprecated and does "
-                    "nothing. A wrapper that keeps passing it inherits two-second defaults "
-                    "that report live hosts as dead over any real latency."
-                ),
+                "head": "Counts the cost before it spends it",
+                "body": "Every protocol against every host is a logon against a "
+                        "lockout counter you cannot see. salvo does the arithmetic up "
+                        "front, reports what it actually cost, and stops the moment a "
+                        "real lockout appears.",
+            },
+        ],
+
+        # The claims salvo makes, each with the evidence that the problem is
+        # real and that salvo answers it. This is the heart of the page.
+        "claims": [
+            {
+                "id": "thrown-away",
+                "claim_short": "Nothing thrown away",
+                "claim": "A provably correct credential should never be filed as a failure.",
                 "evidence": (
-                    "NetExec\u2019s own help says the flag is \u201cno longer used, "
-                    "replaced by per-protocol timeouts.\u201d The replacements default hard: "
-                    "SMB and RPC at 2s, LDAP at 3s — short enough to time out on tunnel "
-                    "latency and render a reachable host as a dead one."
+                    "A login can fail for reasons that mean the password was right: "
+                    "<code>STATUS_LOGON_TYPE_NOT_GRANTED</code>, account disabled, "
+                    "password expired, logon-hour and workstation restrictions. "
+                    "Two-state tooling records all of them as failed, and you lose a "
+                    "credential you already own. salvo marks these "
+                    "<code>VALID*</code> and lists every one under a NOT A VERDICT "
+                    "block — still live, named, retestable from somewhere else."
                 ),
-                "artifact": (
-                    "A <code>TIMEOUT_FLAG</code> map emits the per-protocol flag instead — "
-                    "<code>--smb-timeout</code>, <code>--http-timeout</code>, "
-                    "<code>--rpc-timeout</code>, and the rest. ftp, vnc and ldap expose no "
-                    "timeout flag at all, and salvo encodes that gap rather than guessing."
-                ),
-                "verify": "salvo --slow 10.10.100.0/24 -C creds.txt -d corp.local",
-                "verify_note": "tunnel preset that raises every per-protocol timeout at once",
             },
             {
                 "id": "pwn3d",
-                "nav": "Pwn3d meanings",
-                "title": "One word, several unrelated meanings",
-                "claim": (
-                    "NetExec prints <code>Pwn3d!</code> for conditions that are not the "
-                    "same thing. Collapsing them into one verdict is how a standard-user "
-                    "shell gets mistaken for domain admin."
-                ),
+                "claim_short": "Pwn3d disambiguated",
+                "claim": "\u201cPwn3d!\u201d is not one thing, and treating it as one puts a false privilege level in the report.",
                 "evidence": (
-                    "On smb, <code>Pwn3d!</code> proves write access to ADMIN$ — real local "
-                    "admin. On winrm it proves only that the account is in Remote Management "
-                    "Users, which grants execution with no admin rights whatsoever. Reading "
-                    "those as equal writes a false privilege level into the notes."
+                    "On SMB, <code>Pwn3d!</code> means write access to ADMIN$ — real "
+                    "local admin. On WinRM it means the account is in Remote "
+                    "Management Users, which grants a shell with no admin rights at "
+                    "all. salvo renders the first <code>ADMIN</code> and the second "
+                    "<code>exec</code>, and when nothing proved admin on a host it "
+                    "says so in words rather than leaving it to be assumed."
                 ),
-                "artifact": (
-                    "A per-protocol meaning table renders smb and mssql admin as "
-                    "<code>ADMIN</code>, and winrm/ssh/wmi execution as <code>exec</code>. "
-                    "When no protocol proved admin on a host, the follow-up line says so in "
-                    "words rather than leaving it to be assumed."
-                ),
-                "verify": "",
-                "verify_note": "",
             },
             {
-                "id": "three-buckets",
-                "nav": "Verdict buckets",
-                "title": "The credential two-state logic throws away",
-                "claim": (
-                    "Most tooling records worked or failed. Everything else collapses into "
-                    "failed — which is how a provably correct password gets discarded."
-                ),
+                "id": "lockout",
+                "claim_short": "Lockout counted",
+                "claim": "Every spray is a logon against a counter you can\u2019t see, so the tool should count for you.",
                 "evidence": (
-                    "A password can be correct while the access path is closed: "
-                    "STATUS_LOGON_TYPE_NOT_GRANTED, account disabled, password expired, "
-                    "logon-hour and workstation restrictions all mean the credential checked "
-                    "out. A WinRM refusal is byte-identical whether the account is valid but "
-                    "unprivileged or the password is simply wrong."
+                    "Eight protocols across N hosts is up to 8N logons, and a domain "
+                    "account\u2019s lockout counter lives on the domain controller "
+                    "no matter which member server you touched. The default AD "
+                    "threshold is often five. salvo prints the lockout math before it "
+                    "starts, reports the attempts actually made after, and kills the "
+                    "whole run on the first <code>STATUS_ACCOUNT_LOCKED_OUT</code> "
+                    "instead of finishing the sweep."
                 ),
-                "artifact": (
-                    "Three verdict buckets — valid, blocked (<code>VALID*</code>), unknown "
-                    "(<code>?</code>). A NOT A VERDICT block under the matrix lists every "
-                    "blocked and unknown result with its reason; a credential in that list "
-                    "is still live and named as such."
+            },
+            {
+                "id": "silent-lie",
+                "claim_short": "No silent lies",
+                "claim": "A wrapper that builds the wrong command doesn\u2019t error — it lies to you as a closed port.",
+                "evidence": (
+                    "ssh, ftp, nfs and vnc define no <code>-d</code> flag; pass one "
+                    "and NetExec\u2019s parser exits before a packet is sent, and the "
+                    "empty result renders as <code>-</code> — indistinguishable from "
+                    "\u201cnothing listening.\u201d LDAP takes <code>-d</code> but "
+                    "not <code>--local-auth</code>, and passing it burns a logon. The "
+                    "global <code>--timeout</code> is deprecated and silently ignored. "
+                    "I found each of these by reading NetExec\u2019s source, encoded "
+                    "them in capability tables, and made the tool revalidate itself "
+                    "against whatever NetExec is installed."
                 ),
-                "verify": "",
-                "verify_note": "",
             },
         ],
+
+        # Evidence the reader can run themselves — the strongest kind.
+        "run": [
+            {"cmd": "salvo 192.168.1.0/24 -u jdoe -p 'Password1!' -d corp.local --dry-run",
+             "note": "prints every nxc command it would run, and runs nothing"},
+            {"cmd": "salvo --check-nxc -P all",
+             "note": "diffs salvo\u2019s capability tables against your installed NetExec"},
+            {"cmd": "salvo --selftest",
+             "note": "proves the output parser still agrees with NetExec\u2019s format"},
+        ],
         "close": (
-            "Both audit paths — <code>--selftest</code> for the output parser, "
-            "<code>--check-nxc</code> for the capability tables — are meant to run "
-            "after any NetExec upgrade, so drift surfaces as a failed check rather "
-            "than a wrong cell in the field."
+            "Don\u2019t take the claims on faith. <code>--dry-run</code> shows you "
+            "exactly what it would send, and <code>--check-nxc</code> and "
+            "<code>--selftest</code> are meant to run after any NetExec upgrade, so "
+            "drift shows up as a failed check rather than a wrong answer in the field."
         ),
     },
 
@@ -490,7 +456,7 @@ RESUME = {
     "nav": [
         {"id": "engagement", "label": "Engagement"},
         {"id": "tooling", "label": "Tooling"},
-        {"id": "writeups", "label": "Writeups", "route": "writeups", "arrow": True},
+        {"id": "salvo", "label": "salvo", "route": "salvo", "arrow": True},
         {"id": "background", "label": "Background"},
         {"id": "arsenal", "label": "Arsenal"},
         {"id": "verify", "label": "Verify"},

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}salvo — {{ profile.name }}{% endblock %}
+{% block description %}salvo — why it exists, what it does, and the evidence behind each claim. A credential-spray orchestrator for NetExec, built to stop live access being lost to two-state tooling.{% endblock %}
+
+{% block content %}
+{% set s = r.salvo %}
+
+<!-- ══ salvo — masthead ══════════════════════════════════════════ -->
+<section class="inner mast salvo-mast" id="top">
+  <a class="back" href="{{ url_for('index') }}"><span aria-hidden="true">&larr;</span> {{ profile.name }} — portfolio</a>
+
+  <p class="eyebrow mast-status">Case · Offensive tooling</p>
+
+  <h1 class="mast-name salvo-name">{{ s.name }}</h1>
+
+  <p class="salvo-tagline">{{ s.tagline }}</p>
+  <p class="salvo-stack mono">{{ s.stack }}</p>
+</section>
+
+<!-- ══ The problem ═══════════════════════════════════════════════ -->
+<section class="inner section" id="problem">
+  <header class="s-head">
+    <span class="eyebrow">Why it exists</span>
+    <h2 class="s-title">The problem</h2>
+  </header>
+  <div class="salvo-prose">
+    {% for para in s.problem %}<p>{{ para|safe }}</p>{% endfor %}
+  </div>
+</section>
+
+<!-- ══ What it does ══════════════════════════════════════════════ -->
+<section class="inner section" id="does">
+  <header class="s-head">
+    <span class="eyebrow">In one look</span>
+    <h2 class="s-title">What it does</h2>
+  </header>
+  <div class="does">
+    {% for d in s.does %}
+    <div class="does-row">
+      <h3 class="does-head">{{ d.head }}</h3>
+      <p class="does-body">{{ d.body }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ══ The claims, with evidence ═════════════════════════════════ -->
+<section class="inner section" id="claims">
+  <header class="s-head">
+    <span class="eyebrow">The case</span>
+    <h2 class="s-title">Claims &amp; evidence</h2>
+    <p class="s-sub">Four things salvo asserts, and the evidence each one rests on.</p>
+  </header>
+
+  <ol class="claims">
+    {% for c in s.claims %}
+    <li class="claim" id="claim-{{ c.id }}">
+      <div class="claim-n" aria-hidden="true">{{ "%02d"|format(loop.index) }}</div>
+      <div class="claim-body">
+        <p class="claim-claim">{{ c.claim|safe }}</p>
+        <div class="claim-evidence">
+          <span class="claim-label">Evidence</span>
+          <p>{{ c.evidence|safe }}</p>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+
+<!-- ══ Run the evidence ══════════════════════════════════════════ -->
+<section class="inner section" id="run">
+  <header class="s-head">
+    <span class="eyebrow">Verify it yourself</span>
+    <h2 class="s-title">Run the evidence</h2>
+  </header>
+
+  <div class="runs">
+    {% for cmd in s.run %}
+    <div class="run">
+      <code>{{ cmd.cmd }}</code>
+      <span class="run-note">{{ cmd.note|safe }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <p class="salvo-close">{{ s.close|safe }}</p>
+  <p class="tools-note">Source at <a href="{{ s.url }}" rel="noopener">{{ s.url|replace('https://', '') }}</a></p>
+  <p class="wu-return"><a href="{{ url_for('index') }}"><span aria-hidden="true">&larr;</span> Back to the portfolio</a></p>
+</section>
+
+{% endblock %}

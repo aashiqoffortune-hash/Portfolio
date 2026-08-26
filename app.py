@@ -45,19 +45,22 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/writeups/")
-def writeups():
-    # The rail on this page indexes the findings themselves and points its
-    # brand back to the portfolio home.
-    rail_nav = [
-        {"id": "wu-" + e["id"], "label": e["nav"]}
-        for e in RESUME["writeups"]["entries"]
-    ]
+@app.route("/salvo/")
+def salvo():
+    # The rail on the salvo page indexes the case: the problem, what the tool
+    # does, each claim, and how to run the evidence yourself.
+    rail_nav = (
+        [{"id": "problem", "label": "The problem"},
+         {"id": "does", "label": "What it does"}]
+        + [{"id": "claim-" + c["id"], "label": c["claim_short"]}
+           for c in RESUME["salvo"]["claims"]]
+        + [{"id": "run", "label": "Run the evidence"}]
+    )
     return render_template(
-        "writeups.html",
+        "salvo.html",
         rail_nav=rail_nav,
         home_route="index",
-        rail_role="Writeups",
+        rail_role="salvo",
     )
 
 

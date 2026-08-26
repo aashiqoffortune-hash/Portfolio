@@ -767,3 +767,94 @@ body::after {
 }
 .wu-return a:hover { color: var(--sig-lift); }
 .wu-return span { color: var(--sig-lift); }
+
+/* ── salvo case page ──────────────────────────────────────────────
+   Problem → what it does → claims + evidence → run it. The claim leads
+   each block in bone; the evidence sits beneath it, labelled. */
+
+.tool-case { margin-top: 14px; }
+.tool-case a {
+  font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.04em;
+  text-transform: uppercase; text-decoration: none; color: var(--sig-lift);
+}
+.tool-case a:hover { color: var(--bone); }
+.tool-case span { transition: margin-left 0.16s ease; }
+.tool-case a:hover span { margin-left: 4px; }
+
+.salvo-mast { padding-block: 72px 56px; }
+.salvo-name { font-family: var(--mono); font-weight: 700; font-stretch: normal;
+  font-size: clamp(2.8rem, 9vw, 6rem); letter-spacing: -0.03em; text-transform: none; }
+.salvo-name::before { content: "▍"; color: var(--sig); margin-right: 0.1em; }
+.salvo-tagline {
+  margin-top: 24px; max-width: 52ch;
+  font-family: var(--prose); font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  line-height: 1.35; color: var(--bone);
+}
+.salvo-stack { margin-top: 16px; font-size: 0.78rem; color: var(--bone-3); }
+
+.salvo-prose { display: grid; gap: 18px; max-width: var(--col); }
+.salvo-prose p { color: var(--bone-2); font-size: 1.05rem; }
+.salvo-prose p:first-child { color: var(--bone); }
+
+.does { display: grid; }
+.does-row {
+  display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 30px;
+  padding: 22px 0; border-top: 1px solid var(--rule);
+}
+.does-row:last-child { border-bottom: 1px solid var(--rule); }
+.does-head {
+  font-size: 1.12rem; text-transform: uppercase; color: var(--bone);
+}
+.does-body { color: var(--bone-2); font-size: 0.98rem; max-width: 60ch; }
+
+.claims { display: grid; }
+.claim {
+  display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 34px;
+  padding: 40px 0; border-top: 1px solid var(--rule);
+}
+.claim:first-child { border-top: 1px solid var(--rule-2); }
+.claim:last-child { border-bottom: 1px solid var(--rule); }
+.claim-n {
+  font-family: var(--display); font-weight: 900; font-stretch: 120%;
+  font-size: 3.2rem; line-height: 1; letter-spacing: -0.045em;
+  color: var(--ink-4); font-variant-numeric: tabular-nums;
+}
+.claim-claim {
+  font-family: var(--prose); font-size: 1.32rem; line-height: 1.34;
+  color: var(--bone); max-width: 42ch; margin-bottom: 22px;
+}
+.claim-evidence { position: relative; padding-left: 108px; max-width: var(--col); }
+.claim-evidence p { color: var(--bone-2); font-size: 0.98rem; }
+.claim-label {
+  position: absolute; left: 0; top: 4px;
+  font-family: var(--mono); font-size: 0.64rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em; color: var(--sig-lift);
+}
+
+.claim-claim code, .claim-evidence code, .salvo-prose code, .salvo-close code {
+  font-family: var(--mono); font-size: 0.85em; color: var(--brass);
+  background: var(--ink-3); border: 1px solid var(--rule);
+  border-radius: 3px; padding: 1px 5px;
+}
+
+.runs { display: grid; gap: 10px; max-width: var(--col); }
+.run {
+  padding: 14px 16px; background: var(--ink-2); border-left: 2px solid var(--sig);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px;
+}
+.run > code {
+  font-family: var(--mono); font-size: 0.82rem; color: var(--bone); word-break: break-all;
+}
+.run > code::before { content: "$ "; color: var(--sig-lift); }
+.run-note { font-family: var(--mono); font-size: 0.72rem; color: var(--bone-3); }
+
+.salvo-close { margin-top: 34px; max-width: var(--col); color: var(--bone-2); font-size: 1rem; }
+
+@media (max-width: 1000px) {
+  .does-row { grid-template-columns: 1fr; gap: 8px; }
+  .does-head { color: var(--sig-lift); }
+  .claim { grid-template-columns: 1fr; gap: 14px; }
+  .claim-n { font-size: 1.9rem; }
+  .claim-evidence { padding-left: 0; padding-top: 20px; }
+  .claim-label { position: static; display: block; margin-bottom: 6px; }
+}

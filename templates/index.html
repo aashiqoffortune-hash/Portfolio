@@ -97,6 +97,7 @@
       {% endif %}
 
       {% if p.footer %}<p class="tool-foot">{{ p.footer }}</p>{% endif %}
+      {% if p.case %}<p class="tool-case"><a href="{{ url_for('salvo') }}">Read the full case <span aria-hidden="true">&rarr;</span></a></p>{% endif %}
       {{ tags(p.tags) }}
     </article>
     {% endfor %}
