@@ -4,13 +4,13 @@ Templates read from RESUME only, so updating the portfolio means editing this
 file — no HTML changes required.
 
 The one thing that lives elsewhere is `data/demos.py`: the recorded terminal
-sessions on the salvo page, and the capability tables the page's command builder
-works from. Those are captured output and transcribed code rather than written
-copy, so they are kept apart from the prose and reach the templates through
-RESUME["salvo"] like everything else.
+sessions on the salvo page, the estate its terminal answers for, and the nxc
+capability tables transcribed from salvo itself. That is captured output and
+transcribed code rather than written copy, so it is kept apart from the prose
+and reaches the templates through RESUME["salvo"] like everything else.
 """
 
-from data.demos import BUILDER, DEMOS, LOCKOUT_LAB, MATRIX_LAB
+from data.demos import BOOT, ESTATE, EXAMPLES, NXC, VERDICTS
 
 RESUME = {
     "profile": {
@@ -205,12 +205,15 @@ RESUME = {
         "tagline": "One credential, every NetExec protocol, one honest matrix.",
         "stack": "Python, standard library only. No dependency beyond NetExec itself.",
 
-        # Recorded sessions and the three interactive labs. See data/demos.py
-        # for how each transcript was captured.
-        "demos": DEMOS,
-        "matrix": MATRIX_LAB,
-        "lockout": LOCKOUT_LAB,
-        "builder": BUILDER,
+        # What the page's terminal runs on: the estate it answers for, nxc's
+        # capability tables, the legend, the runnable examples `help` offers,
+        # and one real recorded run for the no-JavaScript case. See
+        # data/demos.py.
+        "estate": ESTATE,
+        "nxc": NXC,
+        "verdicts": VERDICTS,
+        "examples": EXAMPLES,
+        "boot": BOOT,
 
         # Why it exists — the problem, stated the way it actually bites.
         "problem": [

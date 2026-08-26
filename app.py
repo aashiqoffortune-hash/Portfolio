@@ -112,15 +112,14 @@ def index():
 
 @app.route("/salvo/")
 def salvo():
-    # The rail on the salvo page indexes the case: the problem, what the tool
-    # does, each claim, and how to run the evidence yourself.
+    # The rail indexes the case: the problem, what the tool does, each claim,
+    # the terminal it can all be checked in, and how to run it yourself.
     rail_nav = (
         [{"id": "problem", "label": "The problem"},
-         {"id": "does", "label": "What it does"},
-         {"id": "demo", "label": "Watch it run"}]
+         {"id": "does", "label": "What it does"}]
         + [{"id": "claim-" + c["id"], "label": c["claim_short"]}
            for c in RESUME["salvo"]["claims"]]
-        + [{"id": "lab", "label": "Try it yourself"},
+        + [{"id": "shell", "label": "Run it"},
            {"id": "run", "label": "Run the evidence"}]
     )
     return render_template(
@@ -128,6 +127,11 @@ def salvo():
         rail_nav=rail_nav,
         home_route="index",
         rail_role="salvo",
+        # The terminal's opening run, rendered server-side so the section is
+        # readable with no JavaScript, and the prompt string both the markup
+        # and the engine echo.
+        boot=RESUME["salvo"]["boot"],
+        ps1="kali@kali:~$ ",
     )
 
 

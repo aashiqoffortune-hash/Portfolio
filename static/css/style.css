@@ -854,8 +854,8 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
 
 /* ── Verdict palette ──────────────────────────────────────────────
    salvo's whole argument is that a cell has more than two states, so
-   the page needs more than two colours to render one. Seven, each
-   tied to a bucket in the tool rather than to a mood:
+   the page needs more than two colours to render one. Seven, each tied
+   to a bucket in the tool rather than to a mood:
 
      hot     provably administrative, and the lockout that ends a run
      warm    execution without administrative rights
@@ -864,10 +864,7 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
              greying it is exactly how live access gets thrown away)
      unk     the service refused without saying why
      void    no service, no answer — the one glyph about the target
-     self    a fact about salvo, not about the host
-
-   Defined here rather than in the theme blocks at the top of the file
-   because they belong to one page. */
+     self    a fact about salvo, not about the host                    */
 
 :root {
   --v-hot:  #b62f33;
@@ -901,328 +898,131 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
   --v-self: #4fb2c6;
 }
 
-/* ── Terminal window ──────────────────────────────────────────────
-   Recorded sessions. Output lines are block elements rather than a
-   run of text with newlines, because the player hides the ones it
-   has not reached yet and a hidden line has to take no room. Without
-   the script every line is simply visible, which is the whole
-   fallback. */
+/* ── The terminal ─────────────────────────────────────────────────
+   One window, and everything happens inside it. There is deliberately
+   no other control on the page: a slider next to a shell is two design
+   languages arguing, and the shell is the one that can actually run
+   the tool.                                                          */
 
-.term { margin-top: 8px; }
-
-.term-tabs {
-  display: flex; flex-wrap: wrap; gap: 0;
-  border-bottom: 1px solid var(--rule-2); margin-bottom: 26px;
-}
-.term-tab {
-  display: flex; align-items: baseline; gap: 7px;
-  padding: 10px 13px 11px; margin-bottom: -1px;
-  border-bottom: 2px solid transparent;
-  font-family: var(--mono); font-size: 0.71rem; letter-spacing: 0;
-  color: var(--bone-3); text-decoration: none; white-space: nowrap;
-  transition: color 0.14s ease, border-color 0.14s ease;
-}
-.term-tab:first-child { padding-left: 0; }
-.term-tab-n { font-size: 0.66rem; color: var(--ink-4); font-variant-numeric: tabular-nums; }
-.term-tab:hover { color: var(--bone); }
-.term-tab.on { color: var(--bone); border-bottom-color: var(--sig); }
-.term-tab.on .term-tab-n { color: var(--sig-lift); }
-
-.term-pane { margin-bottom: 44px; }
-.term-pane:last-child { margin-bottom: 0; }
-.term-note {
-  max-width: var(--col); margin-bottom: 18px;
-  color: var(--bone-2); font-size: 0.98rem;
-}
-.term-note code {
-  font-family: var(--mono); font-size: 0.85em; color: var(--brass);
-  background: var(--ink-3); border: 1px solid var(--rule);
-  border-radius: 3px; padding: 1px 5px;
-}
-
-.term-win {
+.sh {
   border: 1px solid var(--rule-2); border-radius: 5px;
   background: var(--ink-2); overflow: hidden;
 }
-.term-bar {
+.sh-bar {
   display: flex; align-items: center; gap: 14px;
   padding: 9px 14px; border-bottom: 1px solid var(--rule);
   background: var(--ink-3);
 }
-.term-dots { display: flex; gap: 6px; flex: none; }
-.term-dots i {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: var(--rule-2);
-}
-.term-dots i:first-child { background: var(--v-hot); opacity: 0.65; }
-.term-name {
+.sh-dots { display: flex; gap: 6px; flex: none; }
+.sh-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule-2); }
+.sh-dots i:first-child { background: var(--v-hot); opacity: 0.65; }
+.sh-name {
   flex: 1 1 auto; min-width: 0;
   font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.02em;
-  color: var(--bone-3); white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--bone-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.term-ctl { display: flex; gap: 6px; flex: none; }
-.term-btn {
+.sh-ctl { display: flex; gap: 6px; flex: none; }
+.sh-btn {
   appearance: none; background: transparent; cursor: pointer;
-  border: 1px solid var(--rule-2); border-radius: 3px;
-  padding: 3px 9px; min-width: 34px;
+  border: 1px solid var(--rule-2); border-radius: 3px; padding: 3px 9px;
   font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--bone-3);
   transition: color 0.14s ease, border-color 0.14s ease;
 }
-.term-btn:hover { color: var(--bone); border-color: var(--bone-3); }
-.term-btn[data-act="play"] { color: var(--sig-lift); border-color: var(--sig); }
+.sh-btn:hover { color: var(--bone); border-color: var(--bone-3); }
 
-.term-body {
-  padding: 16px 18px 18px;
-  /* A terminal is a window with a size, not a box that inflates line by
-     line. Reserving the height keeps the page from shunting downward on
-     every printed line while a session plays. */
-  min-height: 330px; max-height: 62vh;
-  overflow: auto; overscroll-behavior: contain;
+/* A terminal is a window with a size, not a box that grows a line at a
+   time. Fixing the height keeps the page still while a run prints. */
+.sh-screen {
+  height: min(68vh, 620px); overflow: auto; overscroll-behavior: contain;
+  padding: 16px 18px 18px; cursor: text;
 }
-.term-cmd {
-  display: flex; align-items: baseline; gap: 8px;
-  font-family: var(--mono); font-size: 0.8rem; line-height: 1.5;
-  color: var(--bone); word-break: break-all; margin-bottom: 12px;
+.sh-screen:focus { outline: none; }
+
+.sh-out, .sh-line {
+  margin: 0; font-family: var(--mono);
+  font-size: clamp(0.6rem, 1.2vw, 0.75rem); line-height: 1.55;
+  white-space: pre; color: var(--bone-2);
 }
-.term-ps1 { color: var(--sig-lift); flex: none; }
-.term-caret {
+/* The screen is the one scroll container, in both axes, so the horizontal
+   scrollbar sits at the bottom of the visible window rather than at the
+   bottom of a scrollback the reader cannot see. */
+.sh-out { overflow: visible; min-width: max-content; }
+.sh-out .tl { display: block; min-height: 1.55em; }
+
+.sh-line { display: flex; align-items: baseline; flex-wrap: wrap; }
+.sh-ps1, .t-ps1 { color: var(--sig-lift); flex: none; white-space: pre; }
+.sh-typed { color: var(--bone); word-break: break-all; }
+.sh-caret {
   display: inline-block; width: 0.55em; height: 1em; flex: none;
   background: var(--sig); transform: translateY(0.12em);
   animation: blink 1.05s steps(1, end) infinite;
 }
 @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
 
-.term-out {
-  margin: 0; font-family: var(--mono);
-  font-size: clamp(0.6rem, 1.25vw, 0.75rem); line-height: 1.55;
-  white-space: pre; color: var(--bone-2);
-  overflow-x: auto; overflow-y: hidden;
+/* The real input is off-screen; the caret and the typed span are what a
+   reader sees. Keeping a genuine <input> is what makes a phone keyboard
+   open and an autofill-free paste behave. */
+.sh-grab {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden;
 }
-.term-out .tl { display: block; min-height: 1.55em; }
-.term-out .tl[hidden] { display: none; }
 
-.k-info  { color: var(--bone-3); }
-.k-warn, .k-bang { color: var(--v-hot); }
-.k-hit   { color: var(--bone); }
-.k-rule  { color: var(--rule-2); }
-
-.t-admin  { color: var(--v-hot);  font-weight: 600; }
-.t-lock   { color: var(--v-hot);  font-weight: 600; }
-.t-exec   { color: var(--v-warm); font-weight: 600; }
-.t-ok     { color: var(--v-ok);   font-weight: 600; }
-.t-blocked, .t-status { color: var(--v-held); font-weight: 600; }
-.t-unk    { color: var(--v-unk);  font-weight: 600; }
-.t-salvo  { color: var(--v-self); font-weight: 600; }
-.t-flag   { color: var(--bone-3); font-weight: 400; }
-.t-addr   { color: var(--bone);   font-weight: 400; }
-.t-mark   { color: var(--sig-lift); }
-
-/* ── Labs ─────────────────────────────────────────────────────────
-   Three panels that recompute. Each renders its opening state on the
-   server, so the script is an upgrade and never a prerequisite. */
-
-.lab { padding-top: 44px; margin-top: 44px; border-top: 1px solid var(--rule); }
-.lab:first-of-type { padding-top: 0; margin-top: 0; border-top: 0; }
-.lab-head { margin-bottom: 30px; }
-.lab-tag {
-  display: block; margin-bottom: 12px;
-  font-family: var(--mono); font-size: 0.66rem; font-weight: 700;
-  letter-spacing: 0.16em; text-transform: uppercase; color: var(--sig-lift);
+.sh-foot {
+  margin-top: 16px; max-width: 62ch;
+  color: var(--bone-3); font-size: 0.88rem;
 }
-.lab-title { font-size: 1.35rem; text-transform: uppercase; }
-.lab-sub {
-  margin-top: 14px; max-width: var(--col);
-  color: var(--bone-2); font-size: 0.98rem;
-}
-.lab-sub code, .lab-foot code, .v-means code {
+.sh-foot code, .s-sub code, .s-sub kbd {
   font-family: var(--mono); font-size: 0.85em; color: var(--brass);
   background: var(--ink-3); border: 1px solid var(--rule);
   border-radius: 3px; padding: 1px 5px;
 }
 
-.lab-grid {
-  display: grid; grid-template-columns: 268px minmax(0, 1fr); gap: 34px;
-  align-items: start;
-}
-.lab-ctls { display: grid; gap: 18px; }
-.lab-out { min-width: 0; display: grid; gap: 14px; }
-.lab-pre { padding: 16px 18px; background: var(--ink-2); border: 1px solid var(--rule); }
-.lab-out .term-win .lab-pre { padding: 0; background: none; border: 0; }
+/* ── Line kinds and the glyphs inside them ────────────────────────
+   Set once on the server for the recorded run and mirrored in the
+   engine, so a line it prints and a line Jinja rendered look the same. */
 
-.ctl { display: grid; gap: 7px; }
-.ctl-lab {
-  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--bone-3);
-}
-.ctl-lab b { color: var(--sig-lift); font-variant-numeric: tabular-nums; }
-.ctl-row { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; }
-.ctl-split { display: flex; gap: 6px; }
-.ctl-sel { display: grid; gap: 7px; flex: 1 1 120px; }
+.k-info  { color: var(--bone-3); }
+.k-warn, .k-bang { color: var(--v-hot); }
+.k-hit   { color: var(--bone); }
+.k-rule  { color: var(--rule-2); }
+.k-cmd   { color: var(--bone); }
+.k-dim   { color: var(--bone-3); }
 
-.ctl input[type="text"], .ctl select, .ctl-split input, .ctl-split select {
-  width: 100%; min-width: 0;
-  background: var(--ink-2); color: var(--bone);
-  border: 1px solid var(--rule-2); border-radius: 3px;
-  padding: 7px 9px;
-  font-family: var(--mono); font-size: 0.75rem;
+/* A printed command is the one affordance the terminal offers: click it
+   and it runs, which beats explaining that it can be typed. */
+.k-run {
+  color: var(--sig-lift); cursor: pointer;
+  text-decoration: none; text-underline-offset: 3px;
 }
-.ctl-split select { width: auto; flex: none; }
-.ctl input[type="text"]:focus, .ctl select:focus { border-color: var(--sig); outline: none; }
+.k-run::before { content: "  $ "; color: var(--bone-3); }
+.k-run:hover { text-decoration: underline; text-decoration-color: currentColor; }
+.k-run:hover::before { color: var(--sig-lift); }
 
-.ctl input[type="range"] {
-  appearance: none; width: 100%; height: 2px; margin: 8px 0;
-  background: var(--rule-2); cursor: pointer;
-}
-.ctl input[type="range"]::-webkit-slider-thumb {
-  appearance: none; width: 14px; height: 14px; border-radius: 50%;
-  background: var(--sig-fill); border: 0;
-}
-.ctl input[type="range"]::-moz-range-thumb {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: var(--sig-fill); border: 0;
-}
-
-.chips { border: 0; padding: 0; margin: 0; display: grid; gap: 9px; }
-.chips legend { padding: 0; }
-.chip {
-  display: inline-flex; align-items: center; cursor: pointer;
-  font-family: var(--mono); font-size: 0.72rem;
-}
-.chip input { position: absolute; opacity: 0; width: 0; height: 0; }
-.chip span {
-  display: block; padding: 4px 9px;
-  border: 1px solid var(--rule-2); border-radius: 3px;
-  color: var(--bone-3); transition: color 0.14s ease, border-color 0.14s ease;
-}
-.chip input:checked + span {
-  color: var(--bone); border-color: var(--sig); background: var(--ink-3);
-}
-.chip input:focus-visible + span { outline: 2px solid var(--sig-lift); outline-offset: 2px; }
-.chips:has(.chip) { display: flex; flex-wrap: wrap; gap: 6px; }
-.chips legend { flex-basis: 100%; margin-bottom: 3px; }
-.chip-wide span { padding: 7px 11px; }
-
-.lab-verdict {
-  font-family: var(--mono); font-size: 0.76rem; line-height: 1.5;
-  padding: 11px 14px; border-left: 2px solid var(--v-ok);
-  background: var(--ink-2); color: var(--bone-2);
-}
-.lab-verdict.over { border-left-color: var(--v-hot); color: var(--bone); }
-.lab-foot { color: var(--bone-3); font-size: 0.88rem; max-width: 62ch; }
-
-/* ── Verdict glyphs and the matrix that carries them ────────────── */
-
-.cell {
-  display: inline-block; min-width: 3.6em; text-align: center;
-  padding: 3px 7px; border: 1px solid var(--rule);
-  border-radius: 3px; background: var(--ink-2);
-  font-family: var(--mono); font-size: 0.72rem; font-weight: 600;
-  text-decoration: none; white-space: nowrap;
-  transition: border-color 0.14s ease, background 0.14s ease;
-}
-a.cell:hover, a.cell.on { border-color: currentColor; background: var(--ink-3); }
-a.cell.on { box-shadow: inset 0 0 0 1px currentColor; }
-
-.g-admin { color: var(--v-hot); }
-.g-exec  { color: var(--v-warm); }
-.g-ok    { color: var(--v-ok); }
-.g-blocked, .g-lock { color: var(--v-held); }
-.g-lock  { color: var(--v-hot); }
-.g-unknown { color: var(--v-unk); }
-.g-none  { color: var(--v-void); }
-.g-na, .g-cmd, .g-err { color: var(--v-self); }
-
-.mx-wrap { overflow-x: auto; padding-bottom: 4px; }
-.mx { border-collapse: collapse; font-family: var(--mono); }
-.mx-cap {
-  caption-side: top; text-align: left; padding-bottom: 12px;
-  font-family: var(--mono); font-size: 0.72rem; color: var(--bone-3);
-}
-.mx th, .mx td { padding: 5px 6px; text-align: center; }
-.mx thead th {
-  font-family: var(--mono); font-weight: 500; font-size: 0.7rem;
-  color: var(--bone-3); border-bottom: 1px solid var(--rule-2);
-  padding-bottom: 9px;
-}
-.mx .mx-h {
-  text-align: left; font-weight: 500; font-size: 0.74rem;
-  color: var(--bone); white-space: nowrap; padding-right: 18px;
-}
-.mx-name { color: var(--bone-3); }
-.mx tbody tr + tr th, .mx tbody tr + tr td { border-top: 1px solid var(--rule); }
-
-.mx-more {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-  margin-top: 18px;
-}
-.mx-more-lab {
-  margin-right: 6px;
-  font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--bone-3);
-}
-
-.vlist { margin-top: 26px; display: grid; gap: 18px; }
-.vlist .vcard[hidden] { display: none; }
-.vcard {
-  padding: 20px 22px; max-width: var(--col);
-  background: var(--ink-2); border: 1px solid var(--rule);
-  border-left: 2px solid var(--rule-2);
-}
-.vcard.k-valid   { border-left-color: var(--v-ok); }
-.vcard.k-blocked { border-left-color: var(--v-held); }
-.vcard.k-unknown { border-left-color: var(--v-unk); }
-.vcard.k-none    { border-left-color: var(--v-void); }
-.vcard.k-salvo   { border-left-color: var(--v-self); }
-
-.v-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.v-name { font-family: var(--display); font-weight: 700; font-size: 1rem; }
-.v-kind {
-  margin-left: auto;
-  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--bone-3);
-}
-.v-row { margin-top: 16px; display: grid; gap: 6px; }
-.v-lab {
-  font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
-  letter-spacing: 0.16em; text-transform: uppercase; color: var(--sig-lift);
-}
-.v-row code, .v-then code {
-  display: block; font-family: var(--mono); font-size: 0.72rem;
-  line-height: 1.55; color: var(--bone); word-break: break-word;
-}
-.v-then span:last-child { color: var(--bone-2); font-size: 0.92rem; }
-.v-then code { display: inline; color: var(--brass); }
-.v-means { margin-top: 14px; color: var(--bone-2); font-size: 0.95rem; }
-
-/* ── Narrow ──────────────────────────────────────────────────── */
-
-@media (max-width: 1000px) {
-  .lab-grid { grid-template-columns: 1fr; gap: 26px; }
-  .term-tab:first-child { padding-left: 16px; }
-  .term-tabs { overflow-x: auto; flex-wrap: nowrap; }
-  .v-kind { margin-left: 0; flex-basis: 100%; }
-}
+.t-admin, .t-lock { color: var(--v-hot);  font-weight: 600; }
+.t-exec   { color: var(--v-warm); font-weight: 600; }
+.t-ok     { color: var(--v-ok);   font-weight: 600; }
+.t-blocked, .t-status { color: var(--v-held); font-weight: 600; }
+.t-unk    { color: var(--v-unk);  font-weight: 600; }
+.t-salvo  { color: var(--v-self); font-weight: 600; }
+.t-flag   { color: var(--bone-3); }
+.t-addr   { color: var(--bone); }
+.t-mark   { color: var(--sig-lift); }
 
 @media (max-width: 520px) {
-  .term-body { padding: 13px 12px 14px; min-height: 280px; max-height: 62vh; }
-  .term-out { font-size: 0.585rem; }
-  .term-name { display: none; }
-  .term-ctl { margin-left: auto; }
-  .vcard { padding: 16px 15px; }
+  .sh-screen { height: 62vh; padding: 13px 12px 14px; }
+  .sh-out, .sh-line { font-size: 0.585rem; }
+  .sh-name { display: none; }
+  .sh-ctl { margin-left: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .term-caret { animation: none; }
+  .sh-caret { animation: none; }
 }
 
 @media print {
-  .term-tabs, .term-ctl, .lab-ctls, .mx-more { display: none !important; }
-  .term-win, .vcard, .lab-pre { border: 1px solid #ccc; background: #fff; }
-  .term-body { max-height: none; overflow: visible; }
-  .term-pane, .lab, .vcard { page-break-inside: avoid; }
+  .sh-ctl, .sh-line { display: none !important; }
+  .sh { border: 1px solid #ccc; background: #fff; }
+  .sh-screen { height: auto; overflow: visible; }
 }
-
-.run { position: relative; }
-.run-copy { margin-left: auto; flex: none; }

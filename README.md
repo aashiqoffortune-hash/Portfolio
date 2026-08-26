@@ -10,23 +10,21 @@ server locally and deploys anywhere that serves plain HTML.
 |---|---|
 | `app.py` | Flask application, routes, and the `terminal` transcript filter |
 | `data/resume.py` | All site content as Python data — the single source of truth |
-| `data/demos.py` | Recorded salvo sessions and the capability tables the labs use |
+| `data/demos.py` | The estate the salvo terminal answers for, and nxc's capability tables |
 | `templates/` | Jinja2 templates (`base.html`, `index.html`, `salvo.html`, `macros.html`) |
 | `static/css/style.css` | The entire design system, tokens at the top |
 | `static/js/main.js` | Progressive enhancement only |
-| `static/js/salvo.js` | The salvo page's terminal player and three labs |
+| `static/js/salvo.js` | The salvo page's terminal — a working salvo in the browser |
 | `static/files/` | Certificate PDFs served as proof |
 | `freeze.py` | Frozen-Flask build → static HTML in `build/` |
 
 No JavaScript framework and no build toolchain. The page is fully readable with
 JavaScript disabled — the scripts drive the rail position marker, the mobile
-menu, entry animations, and the salvo page's player and labs, and nothing is
-hidden until a script has confirmed it can reveal it again.
+menu, entry animations, and the salvo page's terminal, and nothing is hidden
+until a script has confirmed it can reveal it again.
 
-With scripting off, the salvo page loses playback and recalculation and keeps
-every word: all six transcripts print in full, all ten verdict cards stack up,
-the matrix cells become anchors into them, and both computed panels show the
-real output they open on.
+With scripting off, the salvo page loses the prompt and keeps every word: the
+terminal renders one real recorded run in full, already coloured.
 
 ## Run locally
 
@@ -70,44 +68,45 @@ add an entry to `credentials` with its `verify` URL and `pdf` path.
 ## The salvo page
 
 `/salvo/` makes a case for [salvo](https://github.com/aashiqoffortune-hash/salvo)
-and then lets a reader check it: six recorded terminal sessions that replay, a
-verdict matrix whose cells explain themselves, the lockout arithmetic with the
-inputs left open, and `--dry-run` reimplemented in the browser.
+and then lets a reader check it in a terminal. Not a recording and not a mock:
+type a command and the page parses the arguments, plans the jobs, resolves each
+one against a fixed six-host estate, and prints the matrix.
 
-### The recorded sessions
-
-Every transcript in `data/demos.py` is real `salvo` output, not prose shaped to
-look like a terminal. They were captured by running the tool against
-`tests/fake_nxc.py` in salvo's own repository — a stand-in for NetExec that
-emits genuine `nxc` line shapes for a fixed cast of hosts, and exposes the
-switches that make the failure paths reproducible. To re-record:
-
-```bash
-git clone https://github.com/aashiqoffortune-hash/salvo.git && cd salvo
-cp tests/fake_nxc.py /tmp/bin/nxc && chmod +x /tmp/bin/nxc && export PATH=/tmp/bin:$PATH
-
-python3 salvo.py 10.0.0.10 10.0.0.11 -u jdoe -p 'Password123!' -d corp.local
-FAKE_NXC_LOCKOUT=1 python3 salvo.py 10.0.0.10 10.0.0.11 -u jdoe -p 'Password123!' -d corp.local
-FAKE_NXC_FAIL=1    python3 salvo.py 10.0.0.10 -u jdoe -p 'Password123!' -d corp.local -P smb,winrm
-FAKE_NXC_DRIFT=1   python3 salvo.py --check-nxc -P smb,winrm,ldap,ssh
+```
+kali@kali:~$ salvo 10.0.0.0/24 -u jdoe -p 'Password123!' -d corp.local
+kali@kali:~$ salvo 10.0.0.42 -u root -p toor -P ssh,ftp,smb
+kali@kali:~$ salvo --dry-run ...      --selftest    --check-nxc    --legend
+kali@kali:~$ help        hosts        creds         clear
 ```
 
-Paste the output into the matching `transcript` in `data/demos.py`. Column
-alignment is load-bearing — the matrix is a fixed-width table — so the strings
-are stored indented and straightened by `_d()` on import. `app.py`'s `terminal`
-filter decides each line's colour and its dwell on playback; add a new glyph to
-`_TOKENS` there and to the mirror of it at the top of `static/js/salvo.js`.
+Arrow keys walk the history, Tab completes, and any command printed on screen
+runs when clicked.
 
-### The command builder
+### Why it can be trusted
 
-`BUILDER` in `data/demos.py` is a transcription of the capability tables at the
-top of `salvo.py` — which nxc protocol parsers define `-d`, `--local-auth`, `-H`
-and a per-protocol timeout flag. `salvo.js` builds command lines from them the
-way `salvo --dry-run` does, so the panel is only honest while the two agree.
-It was checked against the tool itself across nine input shapes — password and
-hash, domain and local auth, both presets, awkward quoting, multiple targets —
-and matched byte for byte. Re-check it after any change to those tables, and
-after `salvo --check-nxc` reports drift against a newer NetExec.
+`static/js/salvo.js` is a port of the parts of `salvo.py` that decide what a
+cell means — the verdict buckets, the NT status map, the severity order, what
+`Pwn3d!` proves per protocol, and the nxc capability tables. A port can drift,
+so it is tested rather than asserted:
+
+1. `ESTATE` in `data/demos.py` defines the network.
+2. A NetExec stand-in serves that same estate to the real `salvo`, in genuine
+   nxc line shapes.
+3. Real salvo is run against it and the output kept as ground truth.
+4. The page is driven in a headless browser and its output diffed against that,
+   across every command shape the terminal accepts — password and hash, domain
+   and local auth, a wrong password, a lockout, a host with nothing listening.
+
+Nine cases, matching line for line, including the advisories salvo prints when
+a protocol cannot take the credential it was handed. Re-run that diff after any
+change to the engine or the tables, and after `salvo --check-nxc` reports drift
+against a newer NetExec.
+
+`BOOT` is one of those real runs, kept verbatim as the no-JavaScript content of
+the section. `app.py`'s `terminal` filter colours it server-side; the engine
+mirrors the same token rules so a line it prints and a line Jinja rendered look
+identical. Add a glyph to `_TOKENS` in `app.py` and to `TOKENS` in `salvo.js`
+together, or the two will disagree.
 
 ## Design system
 
