@@ -42,7 +42,15 @@
   --col: 74ch;
   --pad: 40px;
 
-  /* Ground layers. Light has almost no room to work in: --ink-4 clears its
+  /* Ground layers. The dark values are the loudest combination that fits:
+     the brightest pixel the ground can make is where a band crosses the
+     bloom, and that pixel is what --ink-4 has to survive at 3:1. Solving it
+     showed the bloom was eating the budget the bands wanted, so it is dialled
+     down and they are dialled up — the slashes are what read as aggression,
+     the bloom was just spending contrast on atmosphere. Scanlines only ever
+     darken, so they are free.
+
+     Light has almost no room to work in: --ink-4 clears its
      3:1 by only 11% on a flat white page, before anything is drawn at all,
      so the ground may never fall below ~0.896 relative luminance. These
      values are a whisper by necessity rather than by taste — the first
@@ -68,9 +76,9 @@
     --sig-lift: #ef6a70;
     --sig-fill: #b62f33;
     --brass:    #c8a24e;
-    --g-scan: rgba(0, 0, 0, 0.32);
-    --g-band: rgba(227, 86, 93, 0.085);
-    --g-glow: rgba(182, 47, 51, 0.16);
+    --g-scan: rgba(0, 0, 0, 0.42);
+    --g-band: rgba(227, 86, 93, 0.095);
+    --g-glow: rgba(182, 47, 51, 0.13);
   }
 }
 
@@ -89,9 +97,9 @@
   --sig-lift: #ef6a70;
   --sig-fill: #b62f33;
   --brass:    #c8a24e;
-  --g-scan: rgba(0, 0, 0, 0.32);
-  --g-band: rgba(227, 86, 93, 0.085);
-  --g-glow: rgba(182, 47, 51, 0.16);
+  --g-scan: rgba(0, 0, 0, 0.42);
+  --g-band: rgba(227, 86, 93, 0.095);
+  --g-glow: rgba(182, 47, 51, 0.13);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -123,7 +131,7 @@ body::before {
   background:
     repeating-linear-gradient(0deg, var(--g-scan) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(118deg,
-      transparent 0 46px, var(--g-band) 46px 48px, transparent 48px 96px),
+      transparent 0 38px, var(--g-band) 38px 41px, transparent 41px 82px),
     radial-gradient(120% 90% at 8% -10%, var(--g-glow) 0%, transparent 62%),
     var(--ink);
 }
@@ -177,7 +185,6 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
 
 .mono { font-family: var(--mono); }
 
-.rule-sig { height: 2px; background: var(--sig); border: 0; margin: 0; }
 
 /* ── Operator rail ────────────────────────────────────────────── */
 
@@ -695,90 +702,10 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
   font-family: var(--mono); font-size: 0.72rem; color: var(--bone-3);
 }
 
-/* ── Writeups ─────────────────────────────────────────────────────
-   Claim → evidence → artifact. Three labelled steps per finding, the
-   artifact carrying the accent as the payoff of the sequence. */
-
-.wu-intro {
-  max-width: var(--col); color: var(--bone-2); font-size: 1.05rem;
-  margin-bottom: 40px;
-}
-
-.wu-list { display: grid; gap: 0; counter-reset: wu; }
-
-.wu {
-  display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 34px;
-  padding: 40px 0; border-top: 1px solid var(--rule);
-}
-.wu:first-child { border-top: 1px solid var(--rule-2); }
-.wu:last-child { border-bottom: 1px solid var(--rule); }
-
-.wu-n {
-  font-family: var(--display); font-weight: 900; font-stretch: normal;
-  font-size: 3.2rem; line-height: 1; letter-spacing: -0.045em;
-  color: var(--ink-4); font-variant-numeric: tabular-nums;
-}
-
-.wu-title {
-  font-size: 1.42rem; text-transform: uppercase; margin-bottom: 24px;
-  max-width: 32ch;
-}
-
-.wu-step {
-  position: relative; padding-left: 108px; margin-bottom: 18px;
-  max-width: var(--col);
-}
-.wu-step:last-of-type { margin-bottom: 0; }
-.wu-step p { color: var(--bone-2); font-size: 0.98rem; }
-
-.wu-label {
-  position: absolute; left: 0; top: 4px;
-  font-family: var(--mono); font-size: 0.64rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.16em;
-  color: var(--bone-3);
-}
-
-/* The three steps escalate: claim states, evidence proves, artifact is
-   where the accent lands — a left rule that only the artifact carries. */
-.wu-artifact { padding-top: 4px; }
-.wu-artifact p { color: var(--bone); }
-.wu-artifact .wu-label { color: var(--sig-lift); }
-.wu-claim p { color: var(--bone); }
-
-.wu-step code {
-  font-family: var(--mono); font-size: 0.86em; color: var(--brass);
-  background: var(--ink-3); border: 1px solid var(--rule);
-  border-radius: 3px; padding: 1px 5px;
-}
-
-.wu-verify {
-  margin-top: 20px; padding: 12px 16px;
-  background: var(--ink-2); border-left: 2px solid var(--sig);
-  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px;
-}
-.wu-verify > code {
-  font-family: var(--mono); font-size: 0.82rem; color: var(--bone);
-}
-.wu-verify > code::before { content: "$ "; color: var(--sig-lift); }
-.wu-verify-note {
-  font-family: var(--mono); font-size: 0.72rem; color: var(--bone-3);
-}
-
-.wu-close {
-  margin-top: 40px; max-width: var(--col);
-  color: var(--bone-2); font-size: 0.98rem;
-}
-
-@media (max-width: 1000px) {
-  .wu { grid-template-columns: 1fr; gap: 16px; }
-  .wu-n { font-size: 1.9rem; }
-  .wu-step { padding-left: 0; padding-top: 22px; }
-  .wu-label { position: static; display: block; margin-bottom: 6px; }
-}
-
-/* ── Writeups page ────────────────────────────────────────────────
-   The findings live on their own page; these style the page shell and
-   the rail's page-link entry that reaches it. */
+/* ── Second-page shell ────────────────────────────────────────────
+   The salvo case lives on its own page; these style the way in and the
+   way back — the rail's page-link entry, the masthead's back link, and
+   the return at the foot. */
 
 .rail-page .ra,
 .rail-index a .ra { color: var(--sig-lift); }
@@ -792,23 +719,16 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
 .back:hover { color: var(--sig-lift); }
 .back span { color: var(--sig-lift); }
 
-.wu-mast { padding-block: 72px 64px; }
-.wu-page-name { font-size: clamp(2.6rem, 8vw, 5.4rem); }
-.wu-mast .mast-disc .sep { color: var(--sig-lift); }
-.wu-thesis {
-  margin-top: 40px;
-  font-size: clamp(1.05rem, 1.8vw, 1.3rem); color: var(--bone-2);
-}
 
-.wu-return {
+.page-return {
   margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--rule);
 }
-.wu-return a {
+.page-return a {
   font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em;
   text-transform: uppercase; text-decoration: none; color: var(--bone-2);
 }
-.wu-return a:hover { color: var(--sig-lift); }
-.wu-return span { color: var(--sig-lift); }
+.page-return a:hover { color: var(--sig-lift); }
+.page-return span { color: var(--sig-lift); }
 
 /* ── salvo case page ──────────────────────────────────────────────
    Problem → what it does → claims + evidence → run it. The claim leads

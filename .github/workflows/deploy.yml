@@ -3,20 +3,20 @@ name: Build and deploy portfolio
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
+# Scoped to the ref so a pull request build can never cancel a deploy of main.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -31,13 +31,28 @@ jobs:
       - name: Build static site
         run: python freeze.py
 
+      # freeze.py exiting zero only means Jinja did not raise. This checks the
+      # bytes that would actually be published: both pages present and not
+      # near-empty, no unrendered template syntax, every local link resolving
+      # to a file that was written, the terminal's data island valid JSON, and
+      # the drawn ground still in the stylesheet.
+      - name: Verify the build
+        run: python tools/check_build.py
+
+      # Only main publishes. A pull request stops at the checks above, which is
+      # the whole point of building it.
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
           path: build
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -14,6 +14,7 @@ server locally and deploys anywhere that serves plain HTML.
 | `templates/` | Jinja2 templates (`base.html`, `index.html`, `salvo.html`, `macros.html`) |
 | `static/css/style.css` | The entire design system, tokens at the top |
 | `tools/check_ground.py` | Proves the page ground broke no text |
+| `tools/check_build.py` | Smoke-tests the frozen site; runs in CI |
 | `static/js/main.js` | Progressive enhancement only |
 | `static/js/salvo.js` | The salvo page's terminal — a working salvo in the browser |
 | `static/files/` | Certificate PDFs served as proof |
@@ -63,6 +64,26 @@ at the top of the file. Frozen-Flask swaps that global for its own
 — binding the import would quietly win that fight and emit absolute
 `/static/...` paths, which 404 under the `/Portfolio/` prefix Pages serves
 from.
+
+## CI
+
+`.github/workflows/deploy.yml` builds on every push to `main` **and on every
+pull request**, but only `main` publishes. A pull request stops after the
+checks, which is the point of building it.
+
+`python freeze.py` exiting zero only means Jinja did not raise — it will
+happily write a page with an unresolved variable in it, a link to an asset
+that was never copied, or a section whose content vanished because the data
+module it read from got renamed. So the build step is followed by
+`tools/check_build.py`, which reads the bytes that would actually be
+published: both pages present and not near-empty, no unrendered template
+syntax, every local link resolving to a file that was written, the terminal's
+data island valid JSON, and the drawn ground still in the stylesheet. No
+browser — it runs in CI, where there isn't one.
+
+```bash
+python3 tools/check_build.py       # non-zero exit if the build is not publishable
+```
 
 ## Deploy to GitHub Pages
 
@@ -181,11 +202,20 @@ produce are both safe, every pixel between them is too.
 python3 tools/check_ground.py     # non-zero exit if any pair fails
 ```
 
-It earns its keep: it caught the first attempt at the light values taking
-`--ink-4` to 2.76:1, and the first dark bloom taking it to 2.75:1. The shipped
-values are what survived. Worst pair now loses 2.8 of a contrast point and
-nothing crosses its threshold — tightest are `--bone-3` at 4.65:1 on dark and
-`--ink-4` at 3.04:1 on light.
+It earns its keep. It caught the first light values taking `--ink-4` to
+2.76:1, the first dark bloom taking it to 2.75:1, and a later attempt to make
+the dark theme louder taking `--bone-3` to 4.39:1. The shipped values are what
+survived: worst pair loses 2.7 of a contrast point and nothing crosses its
+threshold — tightest are `--bone-3` at 4.71:1 on dark and `--ink-4` at 3.04:1
+on light.
+
+The dark values are also the loudest combination that fits, and finding them
+was not guesswork. The brightest pixel the ground can produce is where a band
+crosses the bloom, and that pixel is what `--ink-4` has to survive at 3:1.
+Solving the composite showed the bloom was eating the budget the bands wanted
+— so the bloom came down, the bands went up and got denser, and the result is
+more aggressive at better margins than the version before it. Scanlines only
+ever darken the ground, so they are free.
 
 Two knobs, per theme, in the token blocks at the top of `style.css`:
 `--g-scan`, `--g-band` and `--g-glow`. Turn them up for more aggression, then
