@@ -42,7 +42,15 @@
   --col: 74ch;
   --pad: 40px;
 
-  /* The photographic ground. --bg-scrim is a wash of the page colour laid
+  /* The photographic ground — the source photo, tone-mapped by
+     tools/make_backgrounds.py into the only luminance window each theme can
+     safely put behind text (see that file, and tools/check_contrast.py which
+     proves it on the shipped bytes). Because the guarantee is built into the
+     image, --bg-scrim is now only a light wash toward the page colour rather
+     than the thing holding the contrast up. It still adds margin: raising it
+     is always safe, lowering it to 0 is also safe here.
+
+     Previously: --bg-scrim is a wash of the page colour laid
      over the image; it is what keeps the effective background a reader's
      eye integrates equal to --ink, so no text pair moves off the contrast
      it was designed at. Raise the alpha to quiet the image, lower it to
@@ -52,7 +60,7 @@
      ground is much less sensitive to the ground moving than dark text on
      a light one is. */
   --bg-photo: url("../img/bg-light.webp");
-  --bg-scrim: rgba(255, 255, 255, 0.78);
+  --bg-scrim: rgba(255, 255, 255, 0.20);
 }
 
 /* Dark theme: system default (no explicit choice) */
@@ -72,7 +80,7 @@
     --sig-fill: #b62f33;
     --brass:    #c8a24e;
     --bg-photo: url("../img/bg-dark.webp");
-    --bg-scrim: rgba(14, 16, 19, 0.70);
+    --bg-scrim: rgba(14, 16, 19, 0.20);
   }
 }
 
@@ -92,7 +100,7 @@
   --sig-fill: #b62f33;
   --brass:    #c8a24e;
   --bg-photo: url("../img/bg-dark.webp");
-  --bg-scrim: rgba(14, 16, 19, 0.70);
+  --bg-scrim: rgba(14, 16, 19, 0.20);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
