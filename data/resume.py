@@ -10,7 +10,7 @@ transcribed code rather than written copy, so it is kept apart from the prose
 and reaches the templates through RESUME["salvo"] like everything else.
 """
 
-from data.demos import BOOT, ESTATE, EXAMPLES, NXC, VERDICTS
+from data.demos import BOOT, ESTATE, EXAMPLES, NXC, OPENING, VERDICTS
 
 RESUME = {
     "profile": {
@@ -214,6 +214,7 @@ RESUME = {
         "verdicts": VERDICTS,
         "examples": EXAMPLES,
         "boot": BOOT,
+        "opening": OPENING,
 
         # Why it exists — the problem, stated the way it actually bites.
         "problem": [
