@@ -13,6 +13,8 @@ server locally and deploys anywhere that serves plain HTML.
 | `data/demos.py` | The estate the salvo terminal answers for, and nxc's capability tables |
 | `templates/` | Jinja2 templates (`base.html`, `index.html`, `salvo.html`, `macros.html`) |
 | `static/css/style.css` | The entire design system, tokens at the top |
+| `static/img/` | The page backgrounds |
+| `tools/make_backgrounds.py` | Regenerates them |
 | `static/js/main.js` | Progressive enhancement only |
 | `static/js/salvo.js` | The salvo page's terminal — a working salvo in the browser |
 | `static/files/` | Certificate PDFs served as proof |
@@ -128,6 +130,38 @@ exact mistake the tool was built to stop.
 
 Type is `Archivo` (expanded, heavy) for display, `Newsreader` for narrative
 prose, and `JetBrains Mono` for every label, tag and identifier.
+
+### The background
+
+The ground is a photographic surface rather than a flat fill: one fixed layer
+on `body::before`, under all content and over nothing. Panels that carry their
+own surface — the rail, the terminal, code chips — are opaque and sit on top of
+it, so they stay exactly as legible as they were.
+
+`--bg-scrim` is a wash of the page colour laid over the image, and it is the
+whole safety mechanism. Every text token on the site clears WCAG AA against the
+flat colour; the scrim is set so each one still clears it against the *lightest
+part of the image*, which is the only case that can fail. At the shipped values
+the worst pair loses 0.6 of a contrast point and nothing crosses its threshold:
+
+| theme | scrim | image | worst normal text | worst large text |
+|---|---|---|---|---|
+| dark | `rgba(14,16,19,0.70)` | 30% | 5.34:1 (need 4.5) | 3.24:1 (need 3) |
+| light | `rgba(255,255,255,0.78)` | 22% | 4.87:1 (need 4.5) | 3.12:1 (need 3) |
+
+Those alphas are a floor, not a preference — lower them and a token drops under
+AA. Dark tolerates far more image than light, because light text on a dark
+ground is much less sensitive to the ground moving than dark text on a light
+one is.
+
+**Swapping in your own photo.** Drop it in `static/img/` and point `--bg-photo`
+at it in the two theme blocks. Then re-check the numbers above: measure the
+image's luminance extremes, blend them with the scrim, and confirm every text
+token still clears 4.5:1 (3:1 for the three `--ink-4` numerals, which are all
+51px). A busier or brighter photo needs a higher scrim alpha. The shipped
+images are generated — `python3 tools/make_backgrounds.py` — because the
+sandbox this was built in cannot reach a stock photo host; the generator is
+committed so the look can be adjusted rather than only replaced.
 
 One cascade rule matters when editing: `.inner` owns the horizontal gutter, so
 section-level rules must set `padding-block` only. Setting shorthand `padding`
