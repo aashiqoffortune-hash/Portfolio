@@ -20,7 +20,7 @@
   --ink:      #ffffff;   /* page background            */
   --ink-2:    #f7f7f5;   /* rail / surface tint        */
   --ink-3:    #f0efec;   /* inset / code chip          */
-  --ink-4:    #8d8d88;   /* oversized ghost numeral    */
+  --ink-4:    #8d8d88;   /* oversized ghost numeral — see check_ground.py */
 
   --bone:     #181a1f;   /* primary text               */
   --bone-2:   #565b64;   /* secondary text             */
@@ -42,25 +42,14 @@
   --col: 74ch;
   --pad: 40px;
 
-  /* The photographic ground — the source photo, tone-mapped by
-     tools/make_backgrounds.py into the only luminance window each theme can
-     safely put behind text (see that file, and tools/check_contrast.py which
-     proves it on the shipped bytes). Because the guarantee is built into the
-     image, --bg-scrim is now only a light wash toward the page colour rather
-     than the thing holding the contrast up. It still adds margin: raising it
-     is always safe, lowering it to 0 is also safe here.
-
-     Previously: --bg-scrim is a wash of the page colour laid
-     over the image; it is what keeps the effective background a reader's
-     eye integrates equal to --ink, so no text pair moves off the contrast
-     it was designed at. Raise the alpha to quiet the image, lower it to
-     let more through — but these two values are a floor, not a taste:
-     below them a text token drops under WCAG AA against the lightest part
-     of the image. Dark tolerates far more, because light text on a dark
-     ground is much less sensitive to the ground moving than dark text on
-     a light one is. */
-  --bg-photo: url("../img/bg-light.webp");
-  --bg-scrim: rgba(255, 255, 255, 0.20);
+  /* Ground layers. Light has almost no room to work in: --ink-4 clears its
+     3:1 by only 11% on a flat white page, before anything is drawn at all,
+     so the ground may never fall below ~0.896 relative luminance. These
+     values are a whisper by necessity rather than by taste — the first
+     attempt at them was three times louder and took --ink-4 to 2.76. */
+  --g-scan: rgba(24, 26, 31, 0.009);
+  --g-band: rgba(24, 26, 31, 0.020);
+  --g-glow: rgba(182, 47, 51, 0.024);
 }
 
 /* Dark theme: system default (no explicit choice) */
@@ -69,7 +58,7 @@
     --ink:      #0e1013;
     --ink-2:    #15181d;
     --ink-3:    #1b1f25;
-    --ink-4:    #5d6979;
+    --ink-4:    #647081;
     --bone:     #eceef2;
     --bone-2:   #9aa0a8;
     --bone-3:   #858c97;
@@ -79,8 +68,9 @@
     --sig-lift: #ef6a70;
     --sig-fill: #b62f33;
     --brass:    #c8a24e;
-    --bg-photo: url("../img/bg-dark.webp");
-    --bg-scrim: rgba(14, 16, 19, 0.20);
+    --g-scan: rgba(0, 0, 0, 0.32);
+    --g-band: rgba(227, 86, 93, 0.085);
+    --g-glow: rgba(182, 47, 51, 0.16);
   }
 }
 
@@ -89,7 +79,7 @@
   --ink:      #0e1013;
   --ink-2:    #15181d;
   --ink-3:    #1b1f25;
-  --ink-4:    #5d6979;
+  --ink-4:    #647081;
   --bone:     #eceef2;
   --bone-2:   #9aa0a8;
   --bone-3:   #858c97;
@@ -99,42 +89,52 @@
   --sig-lift: #ef6a70;
   --sig-fill: #b62f33;
   --brass:    #c8a24e;
-  --bg-photo: url("../img/bg-dark.webp");
-  --bg-scrim: rgba(14, 16, 19, 0.20);
+  --g-scan: rgba(0, 0, 0, 0.32);
+  --g-band: rgba(227, 86, 93, 0.085);
+  --g-glow: rgba(182, 47, 51, 0.16);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html {
-  scroll-behavior: smooth; scroll-padding-top: 24px;
-  background: var(--ink);          /* the fallback, and the colour behind the image */
-}
+html { scroll-behavior: smooth; scroll-padding-top: 24px; background: var(--ink); }
 
-/* One fixed layer, under every pixel of content and over nothing. It does
-   not scroll, so there is no parallax to go wrong and no repaint on scroll;
-   panels that carry their own surface (--ink-2, --ink-3 — the rail, the
-   terminal, code chips) sit on top of it opaquely and stay exactly as
-   legible as they were. */
+/* ── The ground ───────────────────────────────────────────────────
+   Not a flat fill, and not a photograph — a drawn one, in CSS. It is
+   sharp at any pixel density, it weighs nothing, and every value in
+   it was chosen rather than sampled off an image.
+
+   Three layers, hardest first:
+     · a red bloom bleeding in from the upper left, the only warm
+       thing on the page that is not a deliberate accent
+     · hard diagonal bands on a 96px pitch — the aggressive element,
+       and the reason this reads as tension rather than as texture
+     · fine scanlines, so the flat areas do not look printed
+
+   Every value sits inside the luminance window the text was designed
+   against, and tools/check_ground.py renders this layer on its own to
+   prove it. Panels that carry their own surface — the rail, the
+   terminal, code chips — are opaque and sit on top, untouched. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: linear-gradient(var(--bg-scrim), var(--bg-scrim)), var(--bg-photo);
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  background:
+    repeating-linear-gradient(0deg, var(--g-scan) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(118deg,
+      transparent 0 46px, var(--g-band) 46px 48px, transparent 48px 96px),
+    radial-gradient(120% 90% at 8% -10%, var(--g-glow) 0%, transparent 62%),
+    var(--ink);
 }
 
-/* Someone on a metered connection asked not to be sent this. */
 @media (prefers-reduced-data: reduce) {
-  body::before { background-image: none; }
+  body::before { background: var(--ink); }
 }
 
 body {
   margin: 0;
-  background: transparent;   /* the ground is on html; see body::before */
+  background: transparent;   /* the ground is body::before */
   color: var(--bone);
   font-family: var(--prose);
   font-size: 17px;

@@ -13,10 +13,7 @@ server locally and deploys anywhere that serves plain HTML.
 | `data/demos.py` | The estate the salvo terminal answers for, and nxc's capability tables |
 | `templates/` | Jinja2 templates (`base.html`, `index.html`, `salvo.html`, `macros.html`) |
 | `static/css/style.css` | The entire design system, tokens at the top |
-| `assets/camp-source.jpg` | The source photograph for the page background |
-| `static/img/` | The two backgrounds derived from it |
-| `tools/make_backgrounds.py` | Derives them |
-| `tools/check_contrast.py` | Proves they broke no text |
+| `tools/check_ground.py` | Proves the page ground broke no text |
 | `static/js/main.js` | Progressive enhancement only |
 | `static/js/salvo.js` | The salvo page's terminal — a working salvo in the browser |
 | `static/files/` | Certificate PDFs served as proof |
@@ -133,69 +130,51 @@ exact mistake the tool was built to stop.
 Type is `Archivo` (expanded, heavy) for display, `Newsreader` for narrative
 prose, and `JetBrains Mono` for every label, tag and identifier.
 
-### The background
+### The ground
 
-The ground is a photograph — a tent on a beach at night — rather than a flat
-fill: one fixed layer on `body::before`, under all content and over nothing.
-Panels that carry their own surface (the rail, the terminal, code chips) are
-opaque and sit on top of it, so they stay exactly as legible as they were.
+The page background is drawn in CSS rather than being a flat fill or an image:
+one fixed layer on `body::before`, under all content and over nothing. Three
+layers, hardest first — a red bloom bleeding in from the upper left, hard
+diagonal bands on a 96px pitch, and fine scanlines so the flat areas do not
+look printed. Panels that carry their own surface (the rail, the terminal,
+code chips) are opaque and sit on top of it, untouched.
 
-A photograph behind text can hurt legibility in exactly one way: by making the
-ground brighter than light-on-dark text can survive, or darker than
-dark-on-light text can survive. Solving that for the dimmest token on each
-theme gives a hard window, and it is narrower than it looks:
+Drawn rather than photographed, for three reasons that all turned out to
+matter: it is sharp at any pixel density, it weighs nothing, and every value
+in it is chosen rather than sampled — which means the aggression can be dialled
+against the contrast budget instead of fought with a scrim.
 
-| theme | the ground may never be | window |
-|---|---|---|
-| dark | brighter than 8-bit ~37 | 37 levels |
-| light | darker than 8-bit ~238 | 17 levels |
+That budget is tighter than it looks. A background can only hurt text by making
+the ground brighter than light-on-dark text survives, or darker than
+dark-on-light text survives, and two tokens sit close to their thresholds
+before anything is drawn at all: `--ink-4` clears its 3:1 by ~11% on light,
+`--bone-3` clears its 4.5:1 by ~15%. So there is very little room, and the
+light theme is a whisper by necessity rather than by taste.
 
-The obvious approach — drop the photo in and wash it out under a heavy scrim —
-spends that window badly. It throws away the photograph's structure and keeps
-its brightness. So `tools/make_backgrounds.py` tone-maps the photo *into* the
-window instead. Every channel goes through one monotone curve straight into
-the allowed range, which makes the result safe by construction: luminance is a
-convex combination of the channels, so if no channel can leave the window,
-neither can the luminance. Stars, tent, horizon lights and rocks all survive,
-at low amplitude.
-
-That curve is also contractive everywhere, which matters on a night
-photograph. The alternative — scaling each pixel by the ratio of its target
-luminance to its actual one — has unbounded gain wherever the source is near
-black, and amplifies sensor noise into coloured blotches across the whole
-foreground. This was visible in a first attempt and is why the code does not
-work that way.
-
-The window itself is **solved, not chosen**: `MARGIN` says how far above the
-WCAG threshold every pair must land, and the brightness the photo is allowed
-to reach follows from the text colours. `MARGIN = 1.05` is what this palette
-can afford — `--bone-3` on light is 5.20:1 against a 4.5 requirement before
-any image exists, so there is only ~13% of headroom in the whole design.
-Asking for 15% makes the light theme infeasible and the solver says so instead
-of quietly returning a blank image.
-
-`tools/check_contrast.py` is the guarantee, and it reads what actually ships:
-it parses the scrim alphas and image paths back out of `style.css`, takes the
-*extreme* pixel of each shipped WebP, blends it with the scrim exactly as the
-browser will, and measures every text token against it. If the worst pixel is
-safe then every pixel is. Run it after touching either file:
+`tools/check_ground.py` is the guarantee. Because the ground is gradients there
+is no file to measure, so it renders the layer on its own in a real browser
+with all content hidden, reads the extreme pixels back out of the screenshot at
+four viewport sizes — the gradients are sized in `%` and `vw`, so the bloom
+lands differently on a phone than on a wide desktop — and puts those extremes
+against every text token. If the brightest and darkest pixel the ground can
+produce are both safe, every pixel between them is too.
 
 ```bash
-python3 tools/make_backgrounds.py     # PYTHONPATH=tools
-python3 tools/check_contrast.py       # non-zero exit if any pair fails
+python3 tools/check_ground.py     # non-zero exit if any pair fails
 ```
 
-At the shipped values the worst pair loses 1.4 of a contrast point and nothing
-crosses its threshold — tightest is `--bone-3` at 4.81:1 on light and
-`--ink-4` (a 51px numeral, so bound by 3:1) at 3.08:1. The two files are 24KB
-and 12KB.
+It earns its keep: it caught the first attempt at the light values taking
+`--ink-4` to 2.76:1, and the first dark bloom taking it to 2.75:1. The shipped
+values are what survived. Worst pair now loses 2.8 of a contrast point and
+nothing crosses its threshold — tightest are `--bone-3` at 4.65:1 on dark and
+`--ink-4` at 3.04:1 on light.
 
-**Swapping in a different photograph.** Replace `assets/camp-source.jpg`, re-run
-both tools, and read the checker's table. A brighter or busier photo simply
-lands darker after tone-mapping; nothing needs tuning by hand, and the check
-fails loudly if it ever stops holding.
+Two knobs, per theme, in the token blocks at the top of `style.css`:
+`--g-scan`, `--g-band` and `--g-glow`. Turn them up for more aggression, then
+re-run the check — it will tell you when you have gone too far, and which
+token you broke.
 
-`prefers-reduced-data: reduce` drops the image entirely.
+`prefers-reduced-data: reduce` drops the layer to a flat fill.
 
 One cascade rule matters when editing: `.inner` owns the horizontal gutter, so
 section-level rules must set `padding-block` only. Setting shorthand `padding`
