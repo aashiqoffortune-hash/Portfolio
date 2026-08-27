@@ -15,6 +15,7 @@ server locally and deploys anywhere that serves plain HTML.
 | `static/css/style.css` | The entire design system, tokens at the top |
 | `tools/check_ground.py` | Proves the page ground broke no text |
 | `tools/check_build.py` | Smoke-tests the frozen site; runs in CI |
+| `tools/check_sanitised.py` | Fails the build if anything identifiable is published |
 | `static/js/main.js` | Progressive enhancement only |
 | `static/js/salvo.js` | The salvo page's terminal — a working salvo in the browser |
 | `static/files/` | Certificate PDFs served as proof |
@@ -83,7 +84,28 @@ browser — it runs in CI, where there isn't one.
 
 ```bash
 python3 tools/check_build.py       # non-zero exit if the build is not publishable
+python3 tools/check_sanitised.py   # non-zero exit if anything identifiable leaked
 ```
+
+### On the case study
+
+The sample deliverable on the front page is a written sample against an
+invented environment, and says so in its own opening line. Client work is
+confidential and lab material belongs to the vendor whose lab it is, so
+neither is published — which leaves a written sample as the only honest way to
+show what the deliverable looks like. Every host, address, account and finding
+in it is fictional; addresses are RFC 1918 and the domain uses the reserved
+`.internal` suffix, so nothing in it resolves anywhere.
+
+`tools/check_sanitised.py` enforces that, and it runs in CI. It scans every
+published `.html`, `.css`, `.js`, `.json`, `.txt` and `.svg` for vendor names,
+lab hostnames and accounts, lab VPN address ranges, flag filenames and
+proof-hash formats. It is deliberately blunt: a false positive costs a rename,
+a false negative puts a rules violation on a portfolio used to get hired in
+security. Two things are explicitly allowed and commented as such — "offensive
+security" as a job title, and the published NT hash of the empty string that
+the salvo terminal uses as its sample hash.
+
 
 ## Deploy to GitHub Pages
 

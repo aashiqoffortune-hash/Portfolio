@@ -1011,3 +1011,151 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
   .sh-ctl, .sh-line { display: none !important; }
   .sh { border: 1px solid #ccc; background: #fff; }
 }
+
+/* ── Sample deliverable ───────────────────────────────────────────
+   A written report sample. The findings table has to survive a phone,
+   so below the breakpoint each row becomes a stacked block with its
+   column names carried in ::before rather than a header row that has
+   scrolled out of sight. */
+
+.eng {
+  display: grid; max-width: var(--col); margin-bottom: 44px;
+  border-top: 1px solid var(--rule-2);
+}
+.eng-row {
+  display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 20px;
+  padding: 13px 0; border-bottom: 1px solid var(--rule);
+}
+.eng-k {
+  font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--bone-3); padding-top: 2px;
+}
+.eng-v { color: var(--bone); font-size: 0.96rem; }
+.eng-v em {
+  display: block; margin-top: 3px; font-style: normal;
+  font-family: var(--mono); font-size: 0.74rem; color: var(--bone-3);
+}
+
+.rep-sub {
+  margin: 52px 0 6px;
+  font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.01em;
+}
+.rep-note {
+  margin-bottom: 22px; max-width: var(--col);
+  color: var(--bone-2); font-size: 0.95rem;
+}
+
+.fx-wrap { overflow-x: auto; }
+.fx { width: 100%; border-collapse: collapse; }
+.fx thead th {
+  font-family: var(--mono); font-size: 0.64rem; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--bone-3);
+  text-align: left; padding: 0 14px 10px 0; border-bottom: 1px solid var(--rule-2);
+  white-space: nowrap;
+}
+.fx tbody tr { border-bottom: 1px solid var(--rule); }
+.fx td, .fx tbody th { padding: 14px 14px 14px 0; vertical-align: top; text-align: left; }
+.fx-id {
+  font-family: var(--mono); font-size: 0.74rem; font-weight: 500;
+  color: var(--bone-3); white-space: nowrap;
+}
+.fx-cvss {
+  font-family: var(--mono); font-size: 0.78rem; color: var(--bone-2);
+  font-variant-numeric: tabular-nums;
+}
+.fx-title { color: var(--bone); font-size: 0.94rem; max-width: 46ch; }
+.fx-title em {
+  display: block; margin-top: 4px; font-style: normal;
+  color: var(--bone-3); font-size: 0.86rem;
+}
+
+/* Severity carries the same red the rest of the page reserves for signal;
+   it steps down through brass to plain text rather than inventing a
+   traffic-light palette the design does not otherwise use. */
+.sev {
+  display: inline-block; white-space: nowrap;
+  font-family: var(--mono); font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 8px; border: 1px solid currentColor; border-radius: 2px;
+}
+.s-critical { color: var(--sig-lift); background: var(--ink-3); }
+.s-high     { color: var(--sig-lift); }
+.s-medium   { color: var(--brass); }
+.s-low      { color: var(--bone-3); }
+
+.st {
+  font-family: var(--mono); font-size: 0.68rem; white-space: nowrap;
+  color: var(--bone-3);
+}
+.st-resolved::before { content: "✓ "; color: var(--v-ok); }
+.st-risk-accepted::before { content: "− "; color: var(--brass); }
+.st-open::before { content: "• "; color: var(--sig-lift); }
+
+.fnd {
+  max-width: var(--col); margin-top: 4px;
+  border: 1px solid var(--rule); border-left: 2px solid var(--sig);
+  background: var(--ink-2);
+}
+.fnd-head { padding: 22px 24px 18px; border-bottom: 1px solid var(--rule); }
+.fnd-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.fnd-ref, .fnd-cvss {
+  font-family: var(--mono); font-size: 0.7rem; color: var(--bone-3);
+}
+.fnd-title {
+  margin-top: 14px; font-size: 1.12rem; line-height: 1.25; color: var(--bone);
+}
+.fnd-vector {
+  margin-top: 10px; font-size: 0.7rem; color: var(--bone-3); word-break: break-all;
+}
+.fnd-affected { margin-top: 12px; font-family: var(--mono); font-size: 0.74rem; color: var(--bone-2); }
+.fnd-k {
+  display: inline-block; min-width: 74px;
+  font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--sig-lift);
+}
+.fnd-body { padding: 4px 24px 22px; }
+.fnd-sec { padding: 18px 0; border-bottom: 1px solid var(--rule); }
+.fnd-sec:last-child { border-bottom: 0; padding-bottom: 4px; }
+.fnd-sh {
+  font-family: var(--mono); font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--sig-lift);
+  margin-bottom: 8px;
+}
+.fnd-sec p { color: var(--bone-2); font-size: 0.95rem; }
+
+.carries { display: grid; max-width: var(--col); margin: 0; }
+.carry {
+  display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px;
+  padding: 16px 0; border-top: 1px solid var(--rule);
+}
+.carry:last-child { border-bottom: 1px solid var(--rule); }
+.carry dt {
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em;
+  text-transform: uppercase; color: var(--bone);
+}
+.carry dd { margin: 0; color: var(--bone-2); font-size: 0.94rem; }
+
+@media (max-width: 1000px) {
+  .eng-row { grid-template-columns: 1fr; gap: 4px; }
+  .carry { grid-template-columns: 1fr; gap: 6px; }
+  .carry dt { color: var(--sig-lift); }
+}
+
+@media (max-width: 720px) {
+  /* The table stops being a table: five columns cannot hold a finding
+     title on a phone without either scrolling sideways or shrinking the
+     text past reading size. */
+  .fx thead { position: absolute; left: -9999px; }
+  .fx tbody tr {
+    display: grid; grid-template-columns: auto 1fr; gap: 4px 12px;
+    padding: 16px 0;
+  }
+  .fx td, .fx tbody th { padding: 0; }
+  .fx-title { grid-column: 1 / -1; max-width: none; margin-top: 6px; }
+  .fx-cvss::before {
+    content: "CVSS "; color: var(--bone-3); font-size: 0.66rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .fnd-head, .fnd-body { padding-left: 16px; padding-right: 16px; }
+  .fnd-k { display: block; min-width: 0; margin-bottom: 3px; }
+}

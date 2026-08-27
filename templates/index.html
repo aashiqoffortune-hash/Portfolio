@@ -66,6 +66,86 @@
   </div>
 </section>
 
+<!-- ══ Sample deliverable ════════════════════════════════════════
+     A written sample against an invented environment, and said so
+     plainly on the page. Client work is confidential and lab
+     material belongs to its vendor, so neither is published; this
+     is the honest way to show what the deliverable looks like. -->
+<section class="inner section" id="report">
+  {% set cs = r.case_study %}
+  {{ head("Sample deliverable", "What the report looks like", cs.lede) }}
+
+  <div class="eng">
+    <div class="eng-row"><span class="eng-k">Client</span><span class="eng-v">{{ cs.client }}<em>{{ cs.profile }}</em></span></div>
+    <div class="eng-row"><span class="eng-k">Engagement</span><span class="eng-v">{{ cs.engagement }}</span></div>
+    <div class="eng-row"><span class="eng-k">Window</span><span class="eng-v">{{ cs.window }}</span></div>
+    <div class="eng-row"><span class="eng-k">Standard</span><span class="eng-v">{{ cs.standard }}</span></div>
+  </div>
+
+  <h3 class="rep-sub">Findings</h3>
+  <div class="fx-wrap">
+    <table class="fx">
+      <thead>
+        <tr>
+          <th scope="col">Ref</th>
+          <th scope="col">Severity</th>
+          <th scope="col">CVSS</th>
+          <th scope="col">Finding</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in cs.findings %}
+        <tr>
+          <th scope="row" class="fx-id">{{ f.id }}</th>
+          <td><span class="sev s-{{ f.sev|lower }}">{{ f.sev }}</span></td>
+          <td class="fx-cvss">{{ f.cvss }}</td>
+          <td class="fx-title">{{ f.title }}<em>{{ f.impact }}</em></td>
+          <td><span class="st st-{{ f.status|lower|replace(' ', '-') }}">{{ f.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% set w = cs.worked %}
+  <h3 class="rep-sub">{{ w.id }} in full</h3>
+  <p class="rep-note">One finding as it appears in the report, so the writing is visible
+    rather than described. It is the one worth showing: read alone it is a share
+    permission, and it is not.</p>
+
+  <article class="fnd">
+    <header class="fnd-head">
+      <p class="fnd-meta">
+        <span class="sev s-{{ w.sev|lower }}">{{ w.sev }}</span>
+        <span class="fnd-ref">{{ w.id }}</span>
+        <span class="fnd-cvss">CVSS {{ w.cvss }}</span>
+      </p>
+      <h4 class="fnd-title">{{ w.title }}</h4>
+      <p class="fnd-vector mono">{{ w.vector }}</p>
+      <p class="fnd-affected"><span class="fnd-k">Affected</span>{{ w.affected }}</p>
+    </header>
+    <div class="fnd-body">
+      {% for s in w.sections %}
+      <div class="fnd-sec">
+        <h5 class="fnd-sh">{{ s.head }}</h5>
+        <p>{{ s.body }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </article>
+
+  <h3 class="rep-sub">What every report carries</h3>
+  <dl class="carries">
+    {% for head, body in cs.carries %}
+    <div class="carry">
+      <dt>{{ head }}</dt>
+      <dd>{{ body }}</dd>
+    </div>
+    {% endfor %}
+  </dl>
+</section>
+
 <!-- ══ Tooling ═══════════════════════════════════════════════════ -->
 <section class="inner section" id="tooling">
   {{ head('Built',

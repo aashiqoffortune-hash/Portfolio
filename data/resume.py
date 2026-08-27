@@ -335,6 +335,130 @@ RESUME = {
         ),
     },
 
+    # ── Sample deliverable ────────────────────────────────────────────
+    # A demonstration report against a fictional environment, and labelled
+    # as one on the page. Real client work is confidential and lab material
+    # belongs to the vendor whose lab it is, so neither gets published —
+    # which leaves a written sample as the only honest way to show what the
+    # deliverable actually looks like. Every host, address, account and
+    # finding below is invented. The addresses are RFC 1918 and the domain
+    # uses the reserved .internal suffix, so nothing here resolves anywhere.
+    "case_study": {
+        "client": "A mid-market general insurer",
+        "profile": "~1,200 staff · two data centres · hybrid AD estate",
+        "engagement": "Internal network penetration test",
+        "window": "10 working days, plus a 2-day retest",
+        "standard": "CVSS v3.1 · retest included · authored in SysReptor",
+        "lede": (
+            "Client reports are confidential and lab material belongs to the vendor "
+            "whose lab it is, so neither is published here. What follows is a written "
+            "sample against an invented environment — the same structure, severity "
+            "reasoning and language a real deliverable carries, with nothing real in it."
+        ),
+
+        # The findings table, as it appears on the contents page.
+        "findings": [
+            {"id": "F-01", "sev": "Critical", "cvss": "9.8",
+             "title": "Unauthenticated remote code execution on an internet-facing file transfer appliance",
+             "impact": "Full compromise of a DMZ host holding client claim documents.",
+             "status": "Resolved"},
+            {"id": "F-02", "sev": "High", "cvss": "8.1",
+             "title": "Backup share readable by all domain users exposes a service account credential",
+             "impact": "Any authenticated user reaches an account with rights across the estate.",
+             "status": "Resolved"},
+            {"id": "F-03", "sev": "High", "cvss": "7.5",
+             "title": "Service account with a Kerberos-requestable ticket and a crackable password",
+             "impact": "Offline recovery of a credential holding privileged group membership.",
+             "status": "Resolved"},
+            {"id": "F-04", "sev": "Medium", "cvss": "6.5",
+             "title": "SMB signing not enforced on domain member servers",
+             "impact": "Authentication relayable between hosts by an attacker already on the LAN.",
+             "status": "Risk accepted"},
+            {"id": "F-05", "sev": "Medium", "cvss": "5.3",
+             "title": "Password policy permits an eight-character minimum",
+             "impact": "Materially shortens offline cracking time for every recovered hash.",
+             "status": "Resolved"},
+            {"id": "F-06", "sev": "Low", "cvss": "3.7",
+             "title": "Deprecated TLS cipher suites on internal management interfaces",
+             "impact": "Weakens transport for administrative sessions on the management VLAN.",
+             "status": "Open"},
+        ],
+
+        # One finding written out in full, so the prose is visible rather
+        # than described. F-02 because it is the one that shows a chain:
+        # a finding that reads as low severity in isolation and is not.
+        "worked": {
+            "id": "F-02",
+            "sev": "High",
+            "cvss": "8.1",
+            "vector": "CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N",
+            "title": "Backup share readable by all domain users exposes a service account credential",
+            "affected": "FS-02.corp.internal (10.40.12.24) · share BACKUP$",
+            "sections": [
+                {"head": "Summary",
+                 "body": "A file share on FS-02 permits read access to the built-in Domain "
+                         "Users group. The share holds nightly configuration exports from the "
+                         "job scheduling platform, and one of those exports contains the "
+                         "plaintext credential the scheduler uses to authenticate to member "
+                         "servers. Any account on the domain — including a temporary "
+                         "contractor account, or any account recovered by phishing — can read "
+                         "it."},
+                {"head": "Why this is High and not Medium",
+                 "body": "The share permission on its own is an information disclosure. The "
+                         "severity comes from what the disclosed credential holds: the "
+                         "scheduler account is a member of a group granted local administrator "
+                         "on 40 of 58 member servers, so a single unprivileged read moves an "
+                         "attacker from one authenticated session to administrative access "
+                         "across most of the server estate. The scope metric is set to Changed "
+                         "for that reason — the impact lands outside the component that "
+                         "carries the weakness."},
+                {"head": "Reproduction",
+                 "body": "Enumerated readable shares from a standard domain user account, "
+                         "identified BACKUP$ as readable, and located the credential in a "
+                         "configuration export within it. Authenticating as the disclosed "
+                         "account against a sample of three member servers returned "
+                         "administrative access on all three. Reproduction steps, the exact "
+                         "file path and the evidence captures are in the report body; they are "
+                         "not repeated here."},
+                {"head": "Business impact",
+                 "body": "The claims processing and document management servers are both "
+                         "inside the affected set. An attacker with any foothold on the domain "
+                         "reaches the systems holding policyholder data without needing a "
+                         "second vulnerability, and does so using a valid credential, which "
+                         "makes the activity difficult to separate from normal scheduler "
+                         "traffic in the logs."},
+                {"head": "Remediation",
+                 "body": "Restrict the share to the backup operators group and remove Domain "
+                         "Users. Rotate the scheduler credential, and move it to a group "
+                         "managed service account so it is no longer stored in an exported "
+                         "file. Reduce the scheduler's local administrator rights to the "
+                         "servers that genuinely require them. The first two are configuration "
+                         "changes measured in hours; the third needs a review of which jobs "
+                         "touch which hosts."},
+                {"head": "Retest",
+                 "body": "Re-tested on day 2 of the retest window. Domain Users no longer has "
+                         "read access, the credential has been rotated and migrated, and "
+                         "authenticating as the previous credential fails on all three sampled "
+                         "servers. The rights reduction was in progress and tracked as a "
+                         "follow-up item rather than closed."},
+            ],
+        },
+
+        # What every report carries, whatever the engagement found.
+        "carries": [
+            ("Executive summary", "Written for the person who signs off the budget, not the "
+                                  "person who runs the fix. Risk in business terms, no tool names."),
+            ("Attack narrative", "The route through the estate as one continuous story, so a "
+                                 "reader can see how three medium findings became a critical one."),
+            ("Evidenced reproduction", "Every finding reproducible from the report alone, with "
+                                       "captures taken at the point of proof."),
+            ("Prioritised remediation", "Ordered by risk reduced per hour of work, not by severity "
+                                        "label — the two are not the same list."),
+            ("Retest", "A second pass against the fixes, with findings closed, partially closed "
+                       "or still open stated plainly."),
+        ],
+    },
+
     "professional_experience": [
         {
             "role": "Linux System Administrator / Infrastructure Engineer",
@@ -474,6 +598,7 @@ RESUME = {
 
     "nav": [
         {"id": "engagement", "label": "Engagement"},
+        {"id": "report", "label": "Case study"},
         {"id": "tooling", "label": "Tooling"},
         {"id": "salvo", "label": "salvo", "route": "salvo", "arrow": True},
         {"id": "background", "label": "Background"},

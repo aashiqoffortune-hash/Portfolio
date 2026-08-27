@@ -39,6 +39,13 @@ jobs:
       - name: Verify the build
         run: python tools/check_build.py
 
+      # The case study is a written sample against an invented environment.
+      # This fails the build if a vendor name, lab hostname, lab credential,
+      # lab VPN range or flag format ever reaches the published output — the
+      # kind of thing that is easy to paste in and expensive to have public.
+      - name: Verify nothing identifiable was published
+        run: python tools/check_sanitised.py
+
       # Only main publishes. A pull request stops at the checks above, which is
       # the whole point of building it.
       - uses: actions/upload-pages-artifact@v3
