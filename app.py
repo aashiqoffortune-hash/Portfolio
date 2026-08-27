@@ -4,6 +4,7 @@ Run the dev server:      python app.py
 Build the static site:   python freeze.py
 """
 
+import hashlib
 import os
 import re
 from pathlib import Path
@@ -29,6 +30,56 @@ def _with_pdf_availability(credentials):
     """
     files = Path(app.root_path) / "static"
     return [dict(c, pdf_available=(files / c["pdf"]).is_file()) for c in credentials]
+
+
+# ── Cache busting ─────────────────────────────────────────────────────
+# GitHub Pages serves the CSS and JS with a long cache lifetime and the
+# filenames never change, so a returning visitor keeps whatever copy their
+# browser already has — a redesign ships and they see the old one. Appending
+# a hash of the file's own bytes gives every deploy a URL the cache has not
+# seen, and leaves the URL alone when nothing changed.
+#
+# Frozen-Flask writes the file at its plain path; the query string only ever
+# exists in the markup, which is exactly where it is needed.
+
+_ASSET_HASHES = {}
+
+
+def _asset_version(filename):
+    path = Path(app.root_path) / "static" / filename
+    try:
+        stamp = path.stat().st_mtime_ns
+    except OSError:
+        return None
+    cached = _ASSET_HASHES.get(filename)
+    if cached and cached[0] == stamp:
+        return cached[1]
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()[:10]
+    _ASSET_HASHES[filename] = (stamp, digest)
+    return digest
+
+
+def versioned_url_for(endpoint, **values):
+    """url_for, with a content hash on anything served out of static/.
+
+    Delegates to whatever url_for is currently in the Jinja globals rather
+    than to the one imported at the top of this file. Frozen-Flask swaps that
+    global for its own relative_url_for while it builds, and a context
+    processor outranks a global — so binding the import here would quietly
+    win that fight and emit absolute /static/... paths, which 404 under the
+    /Portfolio/ prefix GitHub Pages serves from.
+    """
+    if endpoint == "static" and "filename" in values and "v" not in values:
+        digest = _asset_version(values["filename"])
+        if digest:
+            values["v"] = digest
+    return app.jinja_env.globals.get("url_for", url_for)(endpoint, **values)
+
+
+@app.context_processor
+def inject_url_for():
+    """Shadow url_for in templates, so every static reference is versioned."""
+    return {"url_for": versioned_url_for}
 
 
 @app.context_processor

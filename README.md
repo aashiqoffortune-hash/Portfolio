@@ -46,6 +46,24 @@ python freeze.py                 # writes build/
 `build/` is self-contained and uses relative URLs, so `build/index.html` opens
 directly in a browser and the directory can be uploaded to any static host.
 
+## Cache busting
+
+Every reference to something in `static/` carries a short hash of that file's
+own bytes — `style.css?v=ef2f85e2ef`. GitHub Pages serves CSS and JS with a
+long cache lifetime and the filenames never change, so without it a returning
+visitor keeps whatever copy their browser already had: a redesign ships and
+they see the old one. The hash changes only when the file does, so caching
+still works exactly as intended the rest of the time.
+
+`versioned_url_for` in `app.py` does this by shadowing `url_for` in the
+template context. One subtlety is load-bearing: it delegates to whatever
+`url_for` currently sits in the Jinja globals rather than to the one imported
+at the top of the file. Frozen-Flask swaps that global for its own
+`relative_url_for` while it builds, and a context processor outranks a global
+— binding the import would quietly win that fight and emit absolute
+`/static/...` paths, which 404 under the `/Portfolio/` prefix Pages serves
+from.
+
 ## Deploy to GitHub Pages
 
 `.github/workflows/deploy.yml` builds and publishes on every push to `main`.
