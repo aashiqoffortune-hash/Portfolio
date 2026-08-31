@@ -88,15 +88,14 @@ python3 tools/check_build.py       # non-zero exit if the build is not publishab
 python3 tools/check_sanitised.py   # non-zero exit if anything identifiable leaked
 ```
 
-### On the case study
+### On published material
 
-The sample deliverable on the front page is a written sample against an
-invented environment, and says so in its own opening line. Client work is
-confidential and lab material belongs to the vendor whose lab it is, so
-neither is published — which leaves a written sample as the only honest way to
-show what the deliverable looks like. Every host, address, account and finding
-in it is fictional; addresses are RFC 1918 and the domain uses the reserved
-`.internal` suffix, so nothing in it resolves anywhere.
+Client work is confidential and lab material belongs to the vendor whose lab it
+is, so neither is published here. Anything that illustrates the work — the
+salvo terminal's estate, for instance — runs against an invented environment:
+addresses are RFC 1918 and domains use the reserved `.internal` suffix, so
+nothing resolves anywhere. `tools/check_sanitised.py` enforces that on every
+build.
 
 `tools/check_sanitised.py` enforces that, and it runs in CI. It scans every
 published `.html`, `.css`, `.js`, `.json`, `.txt` and `.svg` for vendor names,
@@ -121,7 +120,7 @@ directory also drops straight into Netlify, Vercel, or Cloudflare Pages.
 ## Editing content
 
 Everything on the page comes from `RESUME` in `data/resume.py`. Adding a
-credential, a project, a skill group, or a phase of the engagement chain is a
+credential, a project, a skill group, or an engagement package is a
 data edit — the templates pick it up automatically. Section order and labels
 come from the `nav` list in the same file.
 

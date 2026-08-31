@@ -39,7 +39,7 @@ jobs:
       - name: Verify the build
         run: python tools/check_build.py
 
-      # The case study is a written sample against an invented environment.
+      # Anything illustrating the work runs against an invented environment.
       # This fails the build if a vendor name, lab hostname, lab credential,
       # lab VPN range or flag format ever reaches the published output — the
       # kind of thing that is easy to paste in and expensive to have public.

@@ -25,7 +25,7 @@
   <div class="mast-acts">
     <a class="act act-fill" href="mailto:{{ profile.email }}?subject=Engagement%20enquiry">Start a scoping call</a>
     <a class="act" href="#packages">Scope and price</a>
-    <a class="act" href="{{ url_for('index') }}#report">Read a full finding</a>
+    <a class="act" href="#deliverable">What you get</a>
   </div>
 
   <p class="eng-avail"><span class="eng-dot" aria-hidden="true"></span> Taking engagements — next start within five working days of signed paperwork.</p>
@@ -90,10 +90,9 @@
 </section>
 
 <!-- ══ The deliverable ═══════════════════════════════════════════
-     The five things every report carries are the same five listed on
-     the case study, read from r.case_study.carries so the two pages
-     cannot drift apart. The finding itself is not repeated here — it
-     lives on the index page and is linked. -->
+     What a client actually receives. This is the commercial half of
+     the promise, so it lives in the engagements data rather than
+     beside a sample. -->
 <section class="inner section" id="deliverable">
   {{ head('The deliverable',
           'The engagement is worth exactly what the report is worth',
@@ -103,7 +102,7 @@
            without editing it first.') }}
 
   <div class="dlv">
-    {% for name, body in r.case_study.carries %}
+    {% for name, body in e.carries %}
     <div class="dlv-row">
       <h3 class="dlv-head">{{ name }}</h3>
       <p class="dlv-body">{{ body }}</p>
@@ -112,10 +111,9 @@
   </div>
 
   <p class="eng-xref">
-    Most firms show a redacted contents page.
-    <a href="{{ url_for('index') }}#report">Read a complete finding <span aria-hidden="true">&rarr;</span></a>
-    — including the paragraph explaining why it is rated High rather than Medium,
-    which is the paragraph engineers and auditors actually argue about.
+    Every finding is written to be reproducible from the report alone, and scored
+    with the reasoning shown — including why something is rated High rather than
+    Medium, which is the part engineers and auditors actually argue about.
   </p>
 </section>
 

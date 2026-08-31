@@ -21,7 +21,7 @@ from urllib.parse import unquote, urldefrag
 
 PAGES = {
     "index.html": [
-        "Aashiq Shaikh", "Engagement", "salvo",
+        "Aashiq Shaikh", "salvo", "Tooling &amp; research", "Verify",
     ],
     "salvo/index.html": [
         "Run it", "kali@kali", "LOCKOUT MATH", "NOT A VERDICT",
