@@ -11,13 +11,14 @@ server locally and deploys anywhere that serves plain HTML.
 | `app.py` | Flask application, routes, and the `terminal` transcript filter |
 | `data/resume.py` | All site content as Python data — the single source of truth |
 | `data/demos.py` | The estate the salvo terminal answers for, and nxc's capability tables |
-| `templates/` | Jinja2 templates (`base.html`, `index.html`, `salvo.html`, `macros.html`) |
+| `templates/` | Jinja2 templates (`base.html`, `index.html`, `salvo.html`, `engagements.html`, `macros.html`) |
 | `static/css/style.css` | The entire design system, tokens at the top |
 | `tools/check_ground.py` | Proves the page ground broke no text |
 | `tools/check_build.py` | Smoke-tests the frozen site; runs in CI |
 | `tools/check_sanitised.py` | Fails the build if anything identifiable is published |
 | `static/js/main.js` | Progressive enhancement only |
 | `static/js/salvo.js` | The salvo page's terminal — a working salvo in the browser |
+| `static/js/engagements.js` | The engagement page's currency switch — enhancement only |
 | `static/files/` | Certificate PDFs served as proof |
 | `freeze.py` | Frozen-Flask build → static HTML in `build/` |
 

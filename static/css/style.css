@@ -754,6 +754,49 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
 }
 .salvo-stack { margin-top: 16px; font-size: 0.78rem; color: var(--bone-3); }
 
+/* What ships. The install line is the one thing a reader can act on from
+   this page, so it is the only element here given a filled ground; the
+   counts beneath it are set in the same numeral treatment as the stats on
+   the front page, because they are the same kind of claim. */
+.ships { margin-top: 32px; max-width: 60ch; }
+.ships-install {
+  display: flex; align-items: stretch; border: 1px solid var(--rule-2);
+  background: var(--ink-2); flex-wrap: wrap;
+}
+.ships-label {
+  display: flex; align-items: center; padding: 11px 14px;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: #fff; background: var(--sig-fill); flex: none;
+}
+.ships-cmd {
+  padding: 11px 16px; font-family: var(--mono); font-size: 0.88rem;
+  color: var(--bone); background: none; border: 0;
+  display: flex; align-items: center; overflow-x: auto;
+}
+.ships-note {
+  margin-top: 12px; font-size: 0.84rem; line-height: 1.55; color: var(--bone-3);
+}
+.ships-note code { font-size: 0.94em; }
+
+.ships-facts {
+  margin: 22px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px; background: var(--rule); border: 1px solid var(--rule);
+}
+.ships-fact { background: var(--ink); padding: 15px 16px; }
+.ships-fact dt {
+  font-family: var(--display); font-weight: 800; font-size: 1.25rem;
+  letter-spacing: -0.02em; color: var(--sig-lift);
+  font-variant-numeric: tabular-nums;
+}
+.ships-fact dd {
+  margin: 5px 0 0; font-size: 0.82rem; line-height: 1.45; color: var(--bone-2);
+}
+@media (max-width: 620px) {
+  .ships-facts { grid-template-columns: 1fr; }
+}
+
 .salvo-prose { display: grid; gap: 18px; max-width: var(--col); }
 .salvo-prose p { color: var(--bone-2); font-size: 1.05rem; }
 .salvo-prose p:first-child { color: var(--bone); }
@@ -1158,4 +1201,200 @@ a:hover { color: var(--sig-lift); text-decoration-color: currentColor; }
   }
   .fnd-head, .fnd-body { padding-left: 16px; padding-right: 16px; }
   .fnd-k { display: block; min-width: 0; margin-bottom: 3px; }
+}
+
+/* ── Engagements ──────────────────────────────────────────────────
+   The commercial page. The portfolio argues capability; this page has
+   to answer scope, price and date without the reader having to ask,
+   so the price is the loudest thing in each card and the qualifying
+   copy sits quietly around it.
+
+   It reuses the site's atoms — .inner, .section, .s-head, .act, .thesis
+   — and adds only what a price list and an objection list actually
+   need. Nothing here restyles a shared class. */
+
+.eng-mast { padding-block: 72px 56px; }
+.eng-lede {
+  margin-top: 34px; max-width: 58ch;
+  font-size: 1.06rem; line-height: 1.6; color: var(--bone-2);
+}
+.eng-avail {
+  margin-top: 30px; display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 0.78rem; color: var(--bone-3);
+}
+.eng-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--sig); flex: none;
+}
+
+/* Why people call — three trigger states, so a reader can self-identify
+   before they reach a price. */
+.trig {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px; background: var(--rule);
+  border: 1px solid var(--rule); margin-top: 8px;
+}
+.trig-card { background: var(--ink); padding: 26px 24px; }
+.trig-tag {
+  display: block; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 0.66rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--sig-lift);
+}
+.trig-head { font-size: 1.08rem; line-height: 1.3; margin-bottom: 9px; }
+.trig-body { font-size: 0.9rem; line-height: 1.55; color: var(--bone-2); }
+
+/* Scope and price. */
+.pk-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 20px; flex-wrap: wrap; margin-bottom: 26px;
+}
+.pk-hint {
+  font-family: var(--mono); font-size: 0.76rem; color: var(--bone-3);
+  max-width: 52ch;
+}
+.pk-cur { display: inline-flex; border: 1px solid var(--rule-2); flex: none; }
+.pk-cur button {
+  font-family: var(--mono); font-size: 0.74rem; font-weight: 500;
+  letter-spacing: 0.08em; padding: 9px 16px;
+  border: 0; background: transparent; color: var(--bone-2); cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.pk-cur button:hover { color: var(--bone); }
+.pk-cur button[aria-pressed="true"] { background: var(--bone); color: var(--ink); }
+
+.pk {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px; align-items: stretch;
+}
+.pk-card {
+  border: 1px solid var(--rule-2); background: var(--ink);
+  padding: 26px 22px 24px; display: flex; flex-direction: column;
+}
+/* The middle engagement is the one most buyers need, so it is marked
+   rather than merely listed — the accent is spent here and nowhere else
+   in this section. */
+.pk-on { border-color: var(--sig); box-shadow: inset 0 2px 0 0 var(--sig); }
+.pk-flag {
+  font-family: var(--mono); font-size: 0.64rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--bone-3); margin-bottom: 11px;
+}
+.pk-on .pk-flag { color: var(--sig-lift); }
+.pk-name { font-size: 1.16rem; line-height: 1.25; margin-bottom: 9px; }
+.pk-for { font-size: 0.88rem; line-height: 1.5; color: var(--bone-2); }
+.pk-price {
+  margin-top: 20px;
+  font-family: var(--display); font-weight: 800;
+  font-size: clamp(1.7rem, 3.4vw, 2.05rem); letter-spacing: -0.03em;
+  line-height: 1; color: var(--bone); font-variant-numeric: tabular-nums;
+}
+.pk-meta {
+  margin-top: 7px; padding-bottom: 18px; margin-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 0.74rem; color: var(--bone-3);
+}
+.pk-items { list-style: none; margin: 0 0 22px; padding: 0; display: grid; gap: 9px; flex: 1; }
+.pk-items li {
+  position: relative; padding-left: 18px;
+  font-size: 0.87rem; line-height: 1.45; color: var(--bone-2);
+}
+.pk-items li::before {
+  content: ""; position: absolute; left: 0; top: 0.55em;
+  width: 8px; height: 2px; background: var(--sig);
+}
+.pk-items strong { color: var(--bone); font-weight: 600; }
+.pk-act { justify-content: center; width: 100%; }
+
+.pk-terms {
+  list-style: none; margin: 30px 0 0; padding: 22px 0 0;
+  border-top: 1px solid var(--rule); display: grid; gap: 9px; max-width: 74ch;
+}
+.pk-terms li {
+  position: relative; padding-left: 18px;
+  font-family: var(--mono); font-size: 0.78rem; line-height: 1.55;
+  color: var(--bone-3);
+}
+.pk-terms li::before { content: "·"; position: absolute; left: 4px; color: var(--sig); }
+
+/* What every report carries. Read from the case study's own list, so the
+   two pages cannot drift. */
+.dlv { display: grid; gap: 1px; background: var(--rule);
+  border: 1px solid var(--rule); margin-top: 8px; }
+.dlv-row {
+  background: var(--ink); padding: 20px 22px;
+  display: grid; grid-template-columns: 210px 1fr; gap: 22px; align-items: baseline;
+}
+.dlv-head { font-size: 0.98rem; }
+.dlv-body { font-size: 0.9rem; line-height: 1.55; color: var(--bone-2); }
+
+.eng-xref {
+  margin-top: 26px; max-width: var(--col);
+  font-size: 0.94rem; line-height: 1.6; color: var(--bone-2);
+}
+.eng-xref a { color: var(--sig-lift); text-decoration: none; font-weight: 500; }
+.eng-xref a:hover { text-decoration: underline; }
+
+/* How it runs. Numbered because it genuinely is a sequence — the dates
+   only make sense in order. */
+.proc { list-style: none; margin: 8px 0 0; padding: 0; }
+.proc-step {
+  display: grid; grid-template-columns: 52px 1fr 150px; gap: 20px;
+  padding: 20px 0; border-top: 1px solid var(--rule); align-items: baseline;
+}
+.proc-step:first-child { border-top: 0; }
+.proc-n {
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+  color: var(--sig-lift); letter-spacing: 0.06em;
+}
+.proc-head { font-size: 1.02rem; margin-bottom: 5px; }
+.proc-text { font-size: 0.9rem; line-height: 1.5; color: var(--bone-2); }
+.proc-when {
+  font-family: var(--mono); font-size: 0.74rem; color: var(--bone-3);
+  text-align: right;
+}
+
+/* Straight answers. */
+.qa { margin-top: 8px; border-top: 1px solid var(--rule); }
+.qa-item { border-bottom: 1px solid var(--rule); }
+.qa-q {
+  cursor: pointer; padding: 17px 0; list-style: none;
+  font-family: var(--display); font-weight: 600; font-size: 1rem;
+  color: var(--bone);
+  display: flex; justify-content: space-between; align-items: center; gap: 18px;
+}
+.qa-q::-webkit-details-marker { display: none; }
+.qa-q::after {
+  content: "+"; flex: none; line-height: 1;
+  font-family: var(--mono); font-weight: 400; font-size: 1.15rem;
+  color: var(--sig-lift);
+}
+.qa-item[open] .qa-q::after { content: "\2212"; }
+.qa-a {
+  padding: 0 0 20px; max-width: var(--col);
+  font-size: 0.94rem; line-height: 1.62; color: var(--bone-2);
+}
+
+/* Start. */
+.brief {
+  margin-top: 8px; border: 1px solid var(--rule-2);
+  background: var(--ink-2); padding: 24px 22px; max-width: 62ch;
+}
+.brief-head {
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--bone-3); margin-bottom: 14px;
+}
+.brief-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.brief-list li { font-size: 0.92rem; line-height: 1.5; color: var(--bone-2); }
+.brief-act { margin-top: 26px; }
+
+@media (max-width: 900px) {
+  .trig { grid-template-columns: 1fr; }
+  .pk { grid-template-columns: 1fr; }
+  .dlv-row { grid-template-columns: 1fr; gap: 6px; }
+}
+@media (max-width: 620px) {
+  .proc-step { grid-template-columns: 1fr; gap: 5px; }
+  .proc-when { text-align: left; }
+  .pk-bar { align-items: flex-start; }
 }

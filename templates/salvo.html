@@ -16,6 +16,25 @@
 
   <p class="salvo-tagline">{{ s.tagline }}</p>
   <p class="salvo-stack mono">{{ s.stack }}</p>
+
+  {# What ships. A tool other people can install is a different claim from a
+     script in a repository, and every number here is checkable from outside
+     the page. #}
+  <div class="ships">
+    <div class="ships-install">
+      <span class="ships-label">Install</span>
+      <code class="ships-cmd">{{ s.ships.install }}</code>
+    </div>
+    <p class="ships-note">{{ s.ships.note|safe }}</p>
+    <dl class="ships-facts">
+      {% for f in s.ships.facts %}
+      <div class="ships-fact">
+        <dt>{{ f.k }}</dt>
+        <dd>{{ f.v }}</dd>
+      </div>
+      {% endfor %}
+    </dl>
+  </div>
 </section>
 
 <!-- ══ The problem ═══════════════════════════════════════════════ -->
@@ -39,7 +58,7 @@
     {% for d in s.does %}
     <div class="does-row">
       <h3 class="does-head">{{ d.head }}</h3>
-      <p class="does-body">{{ d.body }}</p>
+      <p class="does-body">{{ d.body|safe }}</p>
     </div>
     {% endfor %}
   </div>
