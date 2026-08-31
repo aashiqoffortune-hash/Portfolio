@@ -36,16 +36,15 @@ RESUME = {
             "Offensive security practitioner working Windows, Linux and Active Directory "
             "estates end to end — unauthenticated external position through to domain "
             "compromise, documented to commercial penetration test report standard.",
-            "The defensive half is not background colour. I hardened these stacks to CIS "
-            "Benchmark under RBI and UIDAI mandate, ran the HSMs that held the keys, and "
-            "carried the pager for them. I know how the blue side builds it, which is "
-            "usually where it breaks.",
+            "The defensive half is not background colour. I know how the blue side "
+            "builds this, and where it breaks under a real load — because I was the "
+            "one carrying the pager when it did.",
         ],
     },
 
     # Headline numbers. Every one is drawn from production work or shipped code.
     "stats": [
-        {"value": "30+", "label": "Indian banks on infrastructure I owned"},
+        {"value": "30+", "label": "Indian banks and PSUs served"},
         {"value": "10+", "label": "Tier-1 deployments, SBI / NPCI / BoB / IPPB"},
         {"value": "0", "label": "Critical incidents in two years on call"},
         {"value": "3", "label": "Upstream defects root-caused in NetExec"},
@@ -304,9 +303,8 @@ RESUME = {
             "location": "Mumbai / Bengaluru",
             "lede": (
                 "Sole Mumbai-based infrastructure engineer for iMFAST, a financial "
-                "inclusion platform serving 30+ Indian banks and PSUs across 10+ Tier-1 "
-                "deployments including State Bank of India, NPCI, Bank of Baroda, IPPB "
-                "and BPCL."
+                "inclusion platform carrying real-time authentication and payment "
+                "traffic for public-sector banks."
             ),
             "points": [
                 {
@@ -334,12 +332,6 @@ RESUME = {
                     "body": "Bash and Python tooling for security auditing of Linux middleware "
                             "stacks, holding continuous audit readiness against RBI and NPCI "
                             "frameworks.",
-                },
-                {
-                    "head": "Carried it without a critical incident",
-                    "body": "Zero critical incidents attributable to configuration or security "
-                            "failure across two years of 24/7 on-call ownership of national "
-                            "banking infrastructure.",
                 },
             ],
         },
@@ -442,9 +434,18 @@ RESUME = {
     # they are copy, not arithmetic — nothing on the page computes with
     # them, and the currency switch is a straight substitution.
     "engagements": {
+        # The promise, in the page's largest type. Deliberately not the
+        # portfolio's thesis: a reader arriving from the front page has just
+        # read that sentence, and a buyer landing here cold wants the offer
+        # before the biography.
+        "promise": (
+            "Fixed scope, fixed price, and a report you can hand an auditor "
+            "without editing it first."
+        ),
         "lede": (
-            "Fixed scope, fixed price, dates agreed before anything starts. No hourly "
-            "rate that grows, and no quote that arrives after the work."
+            "Run by someone who spent two years owning the authentication, HSM and PKI "
+            "behind payment platforms for 30+ Indian banks, under RBI and UIDAI "
+            "mandate — and who tests that class of system now."
         ),
 
         # Why anyone is reading this page at all. Nobody buys a penetration
@@ -495,7 +496,7 @@ RESUME = {
                     "CVE triage against what is <strong>actually running</strong>, verified by hand rather than taken from a scanner’s guess",
                     "TLS posture, authentication exposure and credential-stuffing surface",
                     "Full written report with prioritised remediation",
-                    "One retest pass once the fixes are in",
+                    "One retest pass against your fixes",
                 ],
             },
             {
@@ -615,12 +616,12 @@ RESUME = {
                 "a": "My verifiable certifications are RHCE and RHCSA, both linked on the "
                      "portfolio and checkable at Red Hat. I hold no offensive certification "
                      "and I am not going to imply otherwise. What I offer instead is "
-                     "checkable in a different way: a complete written finding on this "
-                     "site, a tool other people install from PyPI, an upstream defect trail "
-                     "in NetExec, and two years of production ownership of the class of "
-                     "infrastructure you are asking me to test. Read the sample finding and "
-                     "judge the work — if it reads like something you would hand an "
-                     "auditor, the question answers itself.",
+                     "checkable in a different way: a tool other people install from "
+                     "PyPI, an upstream defect trail in NetExec, and two years of "
+                     "production ownership of the class of infrastructure you are asking "
+                     "me to test. Ask me for a redacted report sample before you sign "
+                     "anything — if it does not read like something you would hand an "
+                     "auditor, no certification would have fixed that.",
             },
             {
                 "q": "What happens if you do not find anything serious?",

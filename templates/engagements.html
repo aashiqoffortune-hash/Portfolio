@@ -15,10 +15,7 @@
 
   <h1 class="mast-name">Engagements</h1>
 
-  <p class="thesis">
-    {{ profile.thesis }}
-    <span class="turn">{{ profile.thesis_turn }}</span>
-  </p>
+  <p class="thesis">{{ e.promise }}</p>
 
   <p class="eng-lede">{{ e.lede }}</p>
 
@@ -53,11 +50,11 @@
      Prices carry both currencies in data attributes; the toggle is a
      straight substitution and the page is complete without it. -->
 <section class="inner section" id="packages">
-  {{ head('Engagements',
-          'Fixed scope. Fixed price. Dates agreed before anything starts.', none) }}
+  {{ head('Scope & price',
+          'Three engagements, and every price is the whole price', none) }}
 
   <div class="pk-bar">
-    <p class="pk-hint">Prices are the whole price — there is no day-rate meter running underneath them.</p>
+    <p class="pk-hint">Dates are agreed before anything starts. A change of scope is re-quoted before it is done, never billed after.</p>
     <div class="pk-cur" role="group" aria-label="Currency">
       <button type="button" data-cur="inr" aria-pressed="true">INR</button>
       <button type="button" data-cur="usd" aria-pressed="false">USD</button>
