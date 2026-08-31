@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% from "macros.html" import head %}
+
+{% block title %}Engagements — {{ profile.name }}{% endblock %}
+{% block description %}Fixed-scope, fixed-price penetration testing and VAPT — perimeter review, application and infrastructure, internal and Active Directory. Scope, price and timeline stated up front.{% endblock %}
+
+{% block content %}
+{% set e = r.engagements %}
+
+<!-- ══ Masthead ══════════════════════════════════════════════════ -->
+<section class="inner mast eng-mast" id="top">
+  <a class="back" href="{{ url_for('index') }}"><span aria-hidden="true">&larr;</span> {{ profile.name }} — portfolio</a>
+
+  <p class="eyebrow mast-status">Penetration testing · VAPT · {{ profile.location }}</p>
+
+  <h1 class="mast-name">Engagements</h1>
+
+  <p class="thesis">
+    {{ profile.thesis }}
+    <span class="turn">{{ profile.thesis_turn }}</span>
+  </p>
+
+  <p class="eng-lede">{{ e.lede }}</p>
+
+  <div class="mast-acts">
+    <a class="act act-fill" href="mailto:{{ profile.email }}?subject=Engagement%20enquiry">Start a scoping call</a>
+    <a class="act" href="#packages">Scope and price</a>
+    <a class="act" href="{{ url_for('index') }}#report">Read a full finding</a>
+  </div>
+
+  <p class="eng-avail"><span class="eng-dot" aria-hidden="true"></span> Taking engagements — next start within five working days of signed paperwork.</p>
+</section>
+
+<!-- ══ Why people call ═══════════════════════════════════════════ -->
+<section class="inner section" id="why">
+  {{ head('Why people call',
+          'Almost nobody buys a penetration test because they want one',
+          'They buy one because something is blocked. If one of these is your week, the
+           engagement pays for itself the day the report lands.') }}
+
+  <div class="trig">
+    {% for t in e.triggers %}
+    <article class="trig-card">
+      <span class="trig-tag">{{ t.tag }}</span>
+      <h3 class="trig-head">{{ t.head }}</h3>
+      <p class="trig-body">{{ t.body }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ══ Scope and price ═══════════════════════════════════════════
+     Prices carry both currencies in data attributes; the toggle is a
+     straight substitution and the page is complete without it. -->
+<section class="inner section" id="packages">
+  {{ head('Engagements',
+          'Fixed scope. Fixed price. Dates agreed before anything starts.', none) }}
+
+  <div class="pk-bar">
+    <p class="pk-hint">Prices are the whole price — there is no day-rate meter running underneath them.</p>
+    <div class="pk-cur" role="group" aria-label="Currency">
+      <button type="button" data-cur="inr" aria-pressed="true">INR</button>
+      <button type="button" data-cur="usd" aria-pressed="false">USD</button>
+    </div>
+  </div>
+
+  <div class="pk">
+    {% for p in e.packages %}
+    <article class="pk-card{% if p.featured %} pk-on{% endif %}">
+      <span class="pk-flag">{{ p.flag }}</span>
+      <h3 class="pk-name">{{ p.name|safe }}</h3>
+      <p class="pk-for">{{ p.who }}</p>
+
+      <p class="pk-price" data-inr="{{ p.inr }}" data-usd="{{ p.usd }}">{{ p.inr }}</p>
+      <p class="pk-meta">{{ p.meta }}</p>
+
+      <ul class="pk-items">
+        {% for i in p['items'] %}<li>{{ i|safe }}</li>{% endfor %}
+      </ul>
+
+      <a class="act{% if p.featured %} act-fill{% endif %} pk-act"
+         href="mailto:{{ profile.email }}?subject={{ p.subject|urlencode }}%20enquiry">Enquire</a>
+    </article>
+    {% endfor %}
+  </div>
+
+  <ul class="pk-terms">
+    {% for t in e.terms %}<li>{{ t }}</li>{% endfor %}
+  </ul>
+</section>
+
+<!-- ══ The deliverable ═══════════════════════════════════════════
+     The five things every report carries are the same five listed on
+     the case study, read from r.case_study.carries so the two pages
+     cannot drift apart. The finding itself is not repeated here — it
+     lives on the index page and is linked. -->
+<section class="inner section" id="deliverable">
+  {{ head('The deliverable',
+          'The engagement is worth exactly what the report is worth',
+          'A test that finds everything and explains none of it changes nothing. Every
+           report carries five things, whatever the engagement found — authored in
+           self-hosted SysReptor and delivered as a PDF you can hand to an auditor
+           without editing it first.') }}
+
+  <div class="dlv">
+    {% for name, body in r.case_study.carries %}
+    <div class="dlv-row">
+      <h3 class="dlv-head">{{ name }}</h3>
+      <p class="dlv-body">{{ body }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <p class="eng-xref">
+    Most firms show a redacted contents page.
+    <a href="{{ url_for('index') }}#report">Read a complete finding <span aria-hidden="true">&rarr;</span></a>
+    — including the paragraph explaining why it is rated High rather than Medium,
+    which is the paragraph engineers and auditors actually argue about.
+  </p>
+</section>
+
+<!-- ══ How it runs ═══════════════════════════════════════════════ -->
+<section class="inner section" id="process">
+  {{ head('How it runs', 'Five steps, and you know the price before step two', none) }}
+
+  <ol class="proc">
+    {% for s in e.steps %}
+    <li class="proc-step">
+      <span class="proc-n" aria-hidden="true">{{ "%02d"|format(loop.index) }}</span>
+      <div class="proc-body">
+        <h3 class="proc-head">{{ s.head }}</h3>
+        <p class="proc-text">{{ s.body }}</p>
+      </div>
+      <span class="proc-when">{{ s.when }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+
+<!-- ══ Straight answers ══════════════════════════════════════════ -->
+<section class="inner section" id="faq">
+  {{ head('Straight answers', 'The questions that decide it', none) }}
+
+  <div class="qa">
+    {% for f in e.faq %}
+    <details class="qa-item">
+      <summary class="qa-q">{{ f.q }}</summary>
+      <p class="qa-a">{{ f.a }}</p>
+    </details>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ══ Start ═════════════════════════════════════════════════════ -->
+<section class="inner section" id="start">
+  {{ head('Next step', e.close.head, e.close.body) }}
+
+  <div class="brief">
+    <h3 class="brief-head">Put this in the email</h3>
+    <ul class="brief-list">
+      {% for b in e.close.brief %}<li>{{ b }}</li>{% endfor %}
+    </ul>
+  </div>
+
+  <p class="brief-act">
+    <a class="act act-fill" href="mailto:{{ profile.email }}?subject=Engagement%20enquiry">Email {{ profile.email }}</a>
+  </p>
+
+  <p class="page-return"><a href="{{ url_for('index') }}"><span aria-hidden="true">&larr;</span> Back to the portfolio</a></p>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+{# The currency switch. Both prices are already in the markup; if this never
+   loads the page keeps the INR figure and every word around it. #}
+<script src="{{ url_for('static', filename='js/engagements.js') }}" defer></script>
+{% endblock %}

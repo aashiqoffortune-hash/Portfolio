@@ -205,6 +205,25 @@ RESUME = {
         "tagline": "One credential, every NetExec protocol, one honest matrix.",
         "stack": "Python, standard library only. No dependency beyond NetExec itself.",
 
+        # What ships, rather than what it does. A tool other people can install
+        # is a different claim from a script in a repository, and the
+        # difference is checkable from outside — so it is stated in the
+        # numbers that can be checked.
+        "ships": {
+            "install": "pipx install salvo-nxc",
+            "note": (
+                "Published as <code>salvo-nxc</code> — <code>salvo</code> on PyPI is an "
+                "unrelated HTTP load tester by another author. The installed command is "
+                "still <code>salvo</code>."
+            ),
+            "facts": [
+                {"k": "146", "v": "tests, stdlib unittest — no pip, no virtualenv"},
+                {"k": "3.8 → 3.14", "v": "Python versions the suite runs on in CI"},
+                {"k": "0", "v": "dependencies beyond NetExec, asserted by a test"},
+                {"k": "PyPI", "v": "released by tag, published through Trusted Publishing"},
+            ],
+        },
+
         # What the page's terminal runs on: the estate it answers for, nxc's
         # capability tables, the legend, the runnable examples `help` offers,
         # and one real recorded run for the no-JavaScript case. See
@@ -253,6 +272,14 @@ RESUME = {
                         "lockout counter you cannot see. salvo does the arithmetic up "
                         "front, reports what it actually cost, and stops the moment a "
                         "real lockout appears.",
+            },
+            {
+                "head": "Picks up where it stopped, for free",
+                "body": "With <code>--state</code>, a repeat run skips jobs already "
+                        "answered and merges their results back in, so the matrix stays "
+                        "complete even though no single process ever saw all of it. "
+                        "That is not only time saved — every skipped job is an "
+                        "authentication attempt not made against a lockout counter.",
             },
         ],
 
@@ -316,6 +343,28 @@ RESUME = {
                     "against whatever NetExec is installed."
                 ),
             },
+            {
+                "id": "scope",
+                "claim_short": "Scope enforced",
+                "claim": "“It only authenticates” is worth nothing as a promise. It has to be enforced, and the enforcement has to be testable.",
+                "evidence": (
+                    "salvo never passes <code>-x</code>, <code>-X</code>, "
+                    "<code>-M</code>, <code>--sam</code>, <code>--lsa</code>, "
+                    "<code>--ntds</code> or any other execution, dumping or collection "
+                    "flag to NetExec. Every command is checked against an exhaustive "
+                    "allowlist immediately before it spawns, and an unrecognised flag "
+                    "aborts the run rather than being sent. The check reads the whole "
+                    "line rather than the positions flags are expected in — a username "
+                    "or password beginning with <code>-</code> lands exactly where a "
+                    "flag’s value goes, which is where a forbidden one would "
+                    "otherwise ride along unseen. The test suite asserts it across "
+                    "every protocol and every credential shape, reading salvo’s "
+                    "own lists rather than a copy of them, so a flag added later fails "
+                    "CI until someone consciously allows it. That matters under "
+                    "restricted-tooling rules, where what a tool <em>can</em> do is the "
+                    "question being asked."
+                ),
+            },
         ],
 
         # Evidence the reader can run themselves — the strongest kind.
@@ -326,12 +375,16 @@ RESUME = {
              "note": "diffs salvo\u2019s capability tables against your installed NetExec"},
             {"cmd": "salvo --selftest",
              "note": "proves the output parser still agrees with NetExec\u2019s format"},
+            {"cmd": "salvo --scope",
+             "note": "prints the flags salvo may and may not send \u2014 from the lists that gate it, not a copy"},
         ],
         "close": (
             "Don\u2019t take the claims on faith. <code>--dry-run</code> shows you "
-            "exactly what it would send, and <code>--check-nxc</code> and "
-            "<code>--selftest</code> are meant to run after any NetExec upgrade, so "
-            "drift shows up as a failed check rather than a wrong answer in the field."
+            "exactly what it would send and <code>--scope</code> prints the lists that "
+            "decide it, both read out of the code that enforces them. "
+            "<code>--check-nxc</code> and <code>--selftest</code> are meant to run "
+            "after any NetExec upgrade, so drift shows up as a failed check rather "
+            "than a wrong answer in the field."
         ),
     },
 
@@ -596,9 +649,256 @@ RESUME = {
         },
     ],
 
+    # ── Engagements ───────────────────────────────────────────────────
+    # The commercial page. The portfolio answers "can he do it"; this
+    # answers "what does it cost and when can you start", which is the
+    # question that actually has money attached to it.
+    #
+    # Prices are held here as paired strings rather than numbers because
+    # they are copy, not arithmetic — nothing on the page computes with
+    # them, and the currency switch is a straight substitution.
+    "engagements": {
+        "lede": (
+            "Fixed scope, fixed price, dates agreed before anything starts. No hourly "
+            "rate that grows, and no quote that arrives after the work."
+        ),
+
+        # Why anyone is reading this page at all. Nobody buys a penetration
+        # test because they want one — they buy one because something is
+        # blocked, and naming the blockage is what makes the page land.
+        "triggers": [
+            {
+                "tag": "Deadline",
+                "head": "An audit or regulator is asking",
+                "body": "An RBI, NPCI or UIDAI expectation, an ISO 27001 or PCI DSS cycle, "
+                        "or an annual test you have put off. You need a report with "
+                        "evidence and a retest, not a scanner export with a tool’s logo "
+                        "on the cover.",
+            },
+            {
+                "tag": "Revenue",
+                "head": "A customer’s security review is holding a contract",
+                "body": "An enterprise buyer sent a questionnaire and asked for your most "
+                        "recent penetration test. The deal does not move until you produce "
+                        "one. This is the most expensive kind of blocked, and the easiest "
+                        "to unblock.",
+            },
+            {
+                "tag": "Exposure",
+                "head": "You do not know what is exposed",
+                "body": "You shipped fast, the estate grew, staff left with access, and "
+                        "nobody has looked from the outside in. You want the honest "
+                        "version before somebody else finds it and tells you on their "
+                        "own terms.",
+            },
+        ],
+
+        "packages": [
+            {
+                "id": "perimeter",
+                "flag": "Entry engagement",
+                "name": "Perimeter Review",
+                "who": "Everything reachable from the internet without credentials — what "
+                       "an attacker sees before they have anything at all.",
+                "subject": "Perimeter Review",
+                "inr": "₹45,000",
+                "usd": "$650",
+                "meta": "4 working days · report + 1 retest",
+                "featured": False,
+                "items": [
+                    "External attack surface discovery and service fingerprinting",
+                    "Exposed panels, forgotten hosts, stale DNS and subdomain takeover checks",
+                    "CVE triage against what is <strong>actually running</strong>, verified by hand rather than taken from a scanner’s guess",
+                    "TLS posture, authentication exposure and credential-stuffing surface",
+                    "Full written report with prioritised remediation",
+                    "One retest pass once the fixes are in",
+                ],
+            },
+            {
+                "id": "appinfra",
+                "flag": "Most engagements land here",
+                "name": "Application &amp; Infrastructure",
+                "who": "The engagement that satisfies an auditor or an enterprise "
+                       "customer’s security review. The application plus the "
+                       "infrastructure behind it.",
+                "subject": "Application and Infrastructure VAPT",
+                "inr": "₹1,45,000",
+                "usd": "$1,950",
+                "meta": "10 working days · report + retest + readout",
+                "featured": True,
+                "items": [
+                    "Everything in Perimeter Review",
+                    "Authenticated <strong>and</strong> unauthenticated application testing — injection, access control, authentication and session handling, business logic",
+                    "Privilege escalation and horizontal access testing across user roles",
+                    "API testing, including authorisation on every exposed method",
+                    "Server and service hardening reviewed against CIS Benchmark",
+                    "<strong>Attack narrative</strong> — how findings chain, not only a list of them",
+                    "CVSS v3.1 scoring, executive summary, evidenced reproduction",
+                    "Retest pass and a live remediation call with your engineers",
+                ],
+            },
+            {
+                "id": "internal",
+                "flag": "Full estate",
+                "name": "Internal &amp; Active Directory",
+                "who": "Assumed breach. One foothold inside, and the question of how far "
+                       "it reaches — the test that reflects how compromises actually run.",
+                "subject": "Internal and Active Directory assessment",
+                "inr": "₹2,75,000",
+                "usd": "$3,600",
+                "meta": "15 working days · report + retest + readout",
+                "featured": False,
+                "items": [
+                    "Assumed-breach assessment from a standard domain user account",
+                    "Attack path analysis — the edge that actually reaches Domain Admin, mapped before anything is executed",
+                    "Kerberos abuse, ACL and ACE exploitation, delegation review",
+                    "Credential hygiene: password policy under real cracking, service account exposure, reused local administrator",
+                    "Segmentation validated by <strong>pivoting through it</strong>, not by reading the firewall rules",
+                    "Spraying done <strong>against</strong> the lockout policy rather than through it — measured, spaced, and counted before it is spent",
+                    "Full report, retest pass, and an executive readout",
+                ],
+            },
+        ],
+
+        # The commercial terms, stated on the page rather than discovered in
+        # a contract. Every one of these exists to remove a question that
+        # would otherwise cost an email round trip.
+        "terms": [
+            "Scope larger than these, or somewhere in between? Send the shape of the estate and a fixed quote follows within 24 hours.",
+            "Remediation advisory, hardening and follow-up support: ₹18,000 / $240 per day.",
+            "40% to book the dates, 60% on delivery of the report.",
+            "NDA before scoping. Written authorisation naming the in-scope assets before any testing begins.",
+        ],
+
+        "steps": [
+            {"head": "Scoping call",
+             "body": "Twenty minutes. What you run, what you are worried about, and the "
+                     "deadline you are working to. No charge and no obligation.",
+             "when": "Day 0 · free"},
+            {"head": "Fixed quote and dates",
+             "body": "A written scope, a fixed price, and the exact working days it will "
+                     "run. If the scope changes later the price is re-agreed before "
+                     "anything is done — never billed after.",
+             "when": "Within 24 hours"},
+            {"head": "Paperwork and authorisation",
+             "body": "NDA, rules of engagement, and written authorisation to test, signed "
+                     "by someone with the authority to give it. Nothing is touched "
+                     "before this exists.",
+             "when": "Before start"},
+            {"head": "Testing, with the line open",
+             "body": "Anything critical reaches you the hour it is found, not in the "
+                     "report three weeks later. A short daily note says where the "
+                     "engagement is.",
+             "when": "The agreed window"},
+            {"head": "Report, readout, retest",
+             "body": "Full report, a live walkthrough with your engineers, and a retest "
+                     "pass once the fixes are in — each finding marked closed, partially "
+                     "closed or still open.",
+             "when": "+2 days, then retest"},
+        ],
+
+        # Objection handling. Each of these is a question that otherwise ends
+        # the conversation silently, so each is answered in full and without
+        # hedging — including the two that are answered against interest.
+        "faq": [
+            {
+                "q": "You are one person. Why not a firm?",
+                "a": "You get the person who does the work, on the call, every time — not "
+                     "a sales engineer who scoped it and a junior who ran it. The trade is "
+                     "real and worth stating plainly: I cannot field six testers against a "
+                     "five-thousand-host estate in a week. If that is your engagement you "
+                     "want a firm, and I will say so on the call rather than take the "
+                     "booking.",
+            },
+            {
+                "q": "What are your offensive certifications?",
+                "a": "My verifiable certifications are RHCE and RHCSA, both linked on the "
+                     "portfolio and checkable at Red Hat. I hold no offensive certification "
+                     "and I am not going to imply otherwise. What I offer instead is "
+                     "checkable in a different way: a complete written finding on this "
+                     "site, a tool other people install from PyPI, an upstream defect trail "
+                     "in NetExec, and two years of production ownership of the class of "
+                     "infrastructure you are asking me to test. Read the sample finding and "
+                     "judge the work — if it reads like something you would hand an "
+                     "auditor, the question answers itself.",
+            },
+            {
+                "q": "What happens if you do not find anything serious?",
+                "a": "You get the full report and it says so plainly. A clean result against "
+                     "a stated scope is a legitimate outcome and a legitimate thing to show "
+                     "an auditor or a customer; it is only worthless if the scope was too "
+                     "narrow to matter, which is a scoping conversation rather than a "
+                     "testing one. I would rather write an honest thin report than pad a "
+                     "thick one — severity inflation is the fastest way for a report to be "
+                     "dismissed by the engineers who have to act on it.",
+            },
+            {
+                "q": "Is testing our systems legal, and how is it authorised?",
+                "a": "Testing is lawful only with written authorisation from someone "
+                     "empowered to give it for those systems. Before anything begins we "
+                     "sign an NDA, agree rules of engagement in writing — scope, excluded "
+                     "systems, testing hours, escalation contacts — and I take signed "
+                     "authorisation naming the in-scope assets. Some hosting and cloud "
+                     "providers require their own notification, and I will tell you which. "
+                     "Anything outside the signed list is not touched, however interesting "
+                     "it looks.",
+            },
+            {
+                "q": "Will this take production down?",
+                "a": "Denial-of-service testing is out of scope unless you ask for it "
+                     "separately and in writing. Exploitation is done to prove access, not "
+                     "to cause damage, and anything genuinely destructive is demonstrated "
+                     "rather than executed. Testing hours are agreed up front. If something "
+                     "I do causes an unexpected problem I stop and call you immediately — "
+                     "that is what the escalation contact in the rules of engagement is for.",
+            },
+            {
+                "q": "Who owns the report, and how is our data handled?",
+                "a": "You own the report outright. Findings, evidence and anything "
+                     "recovered during testing stay confidential permanently and are never "
+                     "reused as marketing — which is exactly why the sample on this site is "
+                     "written against an invented environment rather than a real client. "
+                     "Evidence is held encrypted for the retest window and the period your "
+                     "NDA specifies, then destroyed on request with written confirmation.",
+            },
+            {
+                "q": "How quickly can you start?",
+                "a": "Within five working days of signed paperwork, and often sooner for a "
+                     "Perimeter Review. If you are against a fixed audit or customer "
+                     "deadline, say the date in your first message and you will get an "
+                     "honest answer about whether it is achievable rather than a booking "
+                     "and a discovery later.",
+            },
+            {
+                "q": "We are outside India. Does that work?",
+                "a": "Yes. The work is remote by nature and invoices in USD. The prices "
+                     "above hold. The only thing worth agreeing up front is an overlap "
+                     "window for the daily notes and the readout call — I work IST and "
+                     "routinely overlap with Europe, the Gulf, and US Eastern mornings.",
+            },
+        ],
+
+        "close": {
+            "head": "Send four lines. Get a fixed quote in 24 hours.",
+            "body": "No discovery funnel, no sales sequence. You email what you have, you "
+                    "get what it costs and what it will take, and you decide. If your "
+                    "engagement is a bad fit for one person, you will be told that too.",
+            "brief": [
+                "What your company does, in a sentence",
+                "What needs testing — an application, an internal network, everything facing the internet",
+                "The deadline, and what it is for — auditor, customer review, board, or nothing yet",
+                "Rough size: number of applications, hosts, or staff",
+            ],
+        },
+    },
+
     "nav": [
         {"id": "engagement", "label": "Engagement"},
         {"id": "report", "label": "Case study"},
+        # Labelled for what a buyer scans for, not for what the page is
+        # titled — "Engagements" would sit one line under "Engagement" in
+        # the rail and read as a duplicate.
+        {"id": "engagements", "label": "Rates & scope", "route": "engagements", "arrow": True},
         {"id": "tooling", "label": "Tooling"},
         {"id": "salvo", "label": "salvo", "route": "salvo", "arrow": True},
         {"id": "background", "label": "Background"},

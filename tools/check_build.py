@@ -26,6 +26,18 @@ PAGES = {
     "salvo/index.html": [
         "Run it", "kali@kali", "LOCKOUT MATH", "NOT A VERDICT",
         "salvo-data", "Claims &amp; evidence",
+        # What ships. These are the checkable claims on the page, so a
+        # rename in the data that empties the block should fail here
+        # rather than quietly publish a case with no install line.
+        "pipx install salvo-nxc", "Scope enforced",
+    ],
+    # The commercial page. Every price is a string in the data rather than
+    # anything computed, so the failure this guards against is the section
+    # vanishing wholesale — a renamed key rendering an empty grid.
+    "engagements/index.html": [
+        "Perimeter Review", "Fixed scope", "The deliverable",
+        "₹45,000", "₹1,45,000", "₹2,75,000",
+        "data-usd", "Straight answers",
     ],
 }
 

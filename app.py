@@ -186,6 +186,27 @@ def salvo():
     )
 
 
+@app.route("/engagements/")
+def engagements():
+    # The rail indexes the page in the order a buyer reads it: what is
+    # blocking them, what it costs, what arrives, how it runs, and the
+    # questions that decide it.
+    rail_nav = [
+        {"id": "why", "label": "Why people call"},
+        {"id": "packages", "label": "Scope & price"},
+        {"id": "deliverable", "label": "The deliverable"},
+        {"id": "process", "label": "How it runs"},
+        {"id": "faq", "label": "Straight answers"},
+        {"id": "start", "label": "Start"},
+    ]
+    return render_template(
+        "engagements.html",
+        rail_nav=rail_nav,
+        home_route="index",
+        rail_role="Engagements",
+    )
+
+
 @app.route("/robots.txt")
 def robots():
     return app.send_static_file("robots.txt")
